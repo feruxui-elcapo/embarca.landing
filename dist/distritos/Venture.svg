@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Capa_2" data-name="Capa 2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 946.8 946.8">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: url(#Degradado_sin_nombre_79-3);
+      }
+
+      .cls-2 {
+        fill: #fff;
+      }
+
+      .cls-3 {
+        fill: none;
+      }
+
+      .cls-4 {
+        fill: url(#Degradado_sin_nombre_79);
+      }
+
+      .cls-5 {
+        fill: url(#Degradado_sin_nombre_79-5);
+      }
+
+      .cls-6 {
+        fill: url(#Degradado_sin_nombre_79-2);
+      }
+
+      .cls-7 {
+        fill: url(#Degradado_sin_nombre_79-4);
+      }
+
+      .cls-8 {
+        clip-path: url(#clippath);
+      }
+    </style>
+    <clipPath id="clippath">
+      <circle class="cls-3" cx="473.4" cy="473.4" r="424.87"/>
+    </clipPath>
+    <linearGradient id="Degradado_sin_nombre_79" data-name="Degradado sin nombre 79" x1="314.18" y1="133.32" x2="826.44" y2="133.32" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#1eba6b"/>
+      <stop offset="1" stop-color="#022c00"/>
+    </linearGradient>
+    <linearGradient id="Degradado_sin_nombre_79-2" data-name="Degradado sin nombre 79" x1="-165.21" y1="430.08" x2="347.06" y2="430.08" xlink:href="#Degradado_sin_nombre_79"/>
+    <linearGradient id="Degradado_sin_nombre_79-3" data-name="Degradado sin nombre 79" x1="418.01" y1="498.08" x2="556.97" y2="498.08" xlink:href="#Degradado_sin_nombre_79"/>
+    <linearGradient id="Degradado_sin_nombre_79-4" data-name="Degradado sin nombre 79" x1="147.45" y1="864.62" x2="659.71" y2="864.62" xlink:href="#Degradado_sin_nombre_79"/>
+    <linearGradient id="Degradado_sin_nombre_79-5" data-name="Degradado sin nombre 79" x1="628.6" y1="617.32" x2="1140.86" y2="617.32" xlink:href="#Degradado_sin_nombre_79"/>
+  </defs>
+  <g id="Capa_1-2" data-name="Capa 1">
+    <g>
+      <circle class="cls-2" cx="473.4" cy="473.4" r="473.4"/>
+      <g class="cls-8">
+        <circle class="cls-4" cx="570.31" cy="133.32" r="256.13"/>
+        <circle class="cls-6" cx="90.92" cy="430.08" r="256.13"/>
+        <circle class="cls-1" cx="487.49" cy="498.08" r="69.48"/>
+        <circle class="cls-7" cx="403.58" cy="864.62" r="256.13"/>
+        <circle class="cls-5" cx="884.73" cy="617.32" r="256.13"/>
+      </g>
+    </g>
+  </g>
+</svg>

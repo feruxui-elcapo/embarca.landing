@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Capa_2" data-name="Capa 2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 950.18 950.18">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #fff;
+      }
+
+      .cls-2 {
+        fill: none;
+      }
+
+      .cls-3 {
+        fill: url(#Degradado_sin_nombre_2);
+      }
+
+      .cls-4 {
+        fill: url(#Degradado_sin_nombre_2-2);
+      }
+
+      .cls-5 {
+        clip-path: url(#clippath);
+      }
+    </style>
+    <clipPath id="clippath">
+      <circle class="cls-2" cx="475.09" cy="475.09" r="426.39"/>
+    </clipPath>
+    <linearGradient id="Degradado_sin_nombre_2" data-name="Degradado sin nombre 2" x1="66.96" y1="1096.56" x2="883.22" y2="1096.56" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#3e00be"/>
+      <stop offset="1" stop-color="#ad2ec7"/>
+    </linearGradient>
+    <linearGradient id="Degradado_sin_nombre_2-2" data-name="Degradado sin nombre 2" x1="882.75" y1="-216.3" x2="-35.57" y2="-234.3" xlink:href="#Degradado_sin_nombre_2"/>
+  </defs>
+  <g id="Capa_1-2" data-name="Capa 1">
+    <g>
+      <circle class="cls-1" cx="475.09" cy="475.09" r="475.09"/>
+      <g class="cls-5">
+        <path class="cls-3" d="M66.96,644.14l408.13,1073.89,408.13-1073.89h0c-225.4-225.4-590.85-225.4-816.26,0h0Z"/>
+        <path class="cls-4" d="M934.42,284.83L475.09-923.79,15.75,284.83h0c253.68,253.68,664.98,253.68,918.67,0h0Z"/>
+      </g>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Capa_2" data-name="Capa 2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 945.43 945.43">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: url(#Degradado_sin_nombre_16);
+      }
+
+      .cls-2 {
+        fill: #fff;
+      }
+
+      .cls-3 {
+        fill: none;
+      }
+
+      .cls-4 {
+        fill: url(#Degradado_sin_nombre_14);
+      }
+
+      .cls-5 {
+        fill: url(#Degradado_sin_nombre_15);
+      }
+
+      .cls-6 {
+        clip-path: url(#clippath);
+      }
+    </style>
+    <clipPath id="clippath">
+      <circle class="cls-3" cx="472.71" cy="472.71" r="424.26"/>
+    </clipPath>
+    <linearGradient id="Degradado_sin_nombre_16" data-name="Degradado sin nombre 16" x1="6126.58" y1="-1917.26" x2="6879.67" y2="-1917.26" gradientTransform="translate(6975.84 -1340.86) rotate(-180)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ea9029"/>
+      <stop offset=".08" stop-color="#e66f35"/>
+      <stop offset=".17" stop-color="#e3553f"/>
+      <stop offset=".27" stop-color="#e14047"/>
+      <stop offset=".38" stop-color="#e0324c"/>
+      <stop offset=".51" stop-color="#df2950"/>
+      <stop offset=".73" stop-color="#df2751"/>
+    </linearGradient>
+    <linearGradient id="Degradado_sin_nombre_14" data-name="Degradado sin nombre 14" x1="6221.85" y1="-2071.93" x2="6784.4" y2="-2071.93" gradientTransform="translate(6975.84 -1340.86) rotate(-180)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ea9029"/>
+      <stop offset=".72" stop-color="#df2751"/>
+    </linearGradient>
+    <linearGradient id="Degradado_sin_nombre_15" data-name="Degradado sin nombre 15" x1="6297.03" y1="-2193.97" x2="6728.52" y2="-2193.97" gradientTransform="translate(6975.84 -1340.86) rotate(-180)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ea9029"/>
+      <stop offset=".17" stop-color="#e98a2b"/>
+      <stop offset=".38" stop-color="#e77b30"/>
+      <stop offset=".61" stop-color="#e5623a"/>
+      <stop offset=".85" stop-color="#e13f47"/>
+      <stop offset="1" stop-color="#df2751"/>
+    </linearGradient>
+  </defs>
+  <g id="Capa_1-2" data-name="Capa 1">
+    <g>
+      <circle class="cls-2" cx="472.71" cy="472.71" r="472.71"/>
+      <g class="cls-6">
+        <path class="cls-1" d="M96.17,196.92l376.54,990.78L849.26,196.92l-129.47-129.47c-136.46-136.46-357.69-136.46-494.15,0L96.17,196.92Z"/>
+        <path class="cls-4" d="M191.44,447.6l281.27,740.1,281.27-740.1-96.71-96.71c-101.93-101.93-267.19-101.93-369.12,0l-96.71,96.71Z"/>
+        <path class="cls-5" d="M266.61,645.4l206.1,542.3,206.1-542.3-70.87-70.87c-74.69-74.69-195.78-74.69-270.47,0l-70.87,70.87Z"/>
+      </g>
+    </g>
+  </g>
+</svg>
