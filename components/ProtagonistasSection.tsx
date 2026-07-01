@@ -476,7 +476,7 @@ export const ProtagonistasSection: React.FC<ProtagonistasProps> = ({ theme, dist
     };
 
     return (
-        <section ref={sectionRef} className="w-full px-[60px] md:px-[100px] py-32 relative z-20 overflow-hidden bg-white/75 backdrop-blur-md">
+        <section ref={sectionRef} className="w-full px-[60px] md:px-[100px] py-16 relative z-20 overflow-hidden bg-white/75 backdrop-blur-md">
             
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 mb-16 w-full">
                 <h2 className="font-sans text-4xl md:text-5xl font-bold text-zinc-800 uppercase italic tracking-tighter" style={{ transform: 'none', perspective: 'none' }}>
@@ -507,70 +507,53 @@ export const ProtagonistasSection: React.FC<ProtagonistasProps> = ({ theme, dist
             <div className="relative w-full">
                 <div 
                     ref={scrollContainerRef}
-                    className="flex overflow-x-auto gap-8 md:gap-12 pb-8 scrollbar-hide snap-x snap-mandatory scroll-smooth"
+                    className="flex overflow-x-auto gap-6 pb-4 scrollbar-hide snap-x snap-mandatory scroll-smooth"
                     style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                 >
-                    {currentItems.map((item, idx) => {
-                        const cols = isNation ? 4 : 5;
-                        const colIdx = idx % cols;
-                        const initialX = (colIdx - (cols - 1) / 2) * 30;
-
-                        return (
-                            <div 
-                                key={idx} 
-                                className="min-w-[240px] sm:min-w-[280px] md:min-w-[300px] lg:min-w-[320px] snap-start shrink-0"
+                    {currentItems.map((item, idx) => (
+                        <div 
+                            key={idx} 
+                            className="w-[170px] sm:w-[190px] md:w-[210px] lg:w-[230px] snap-start shrink-0"
+                            style={{
+                                animation: `fadeInUp 0.4s ease forwards`,
+                                animationDelay: `${idx * 0.05}s`,
+                                opacity: 0,
+                            }}
+                        >
+                            <button
+                                type="button"
+                                className="flex flex-col gap-3 group text-left w-full"
+                                onClick={() => setActiveIndex(idx)}
                             >
-                                <ConvergingCard
-                                    index={idx}
-                                    scrollProgress={scrollProgress}
-                                    initialX={initialX}
-                                    initialY={50} // simpler Y so they don't break
-                                    initialRotation={(idx % 2 === 0 ? 1 : -1) * 10}
-                                    delayStep={0.08}
+                                {/* Image */}
+                                <div
+                                    className="w-full aspect-square bg-white/60 border border-black/10 rounded-lg overflow-hidden relative shadow-sm group-hover:border-black/30 transition-colors shrink-0"
+                                    style={{ cursor: getCursorSvg(theme.colors[0]) }}
                                 >
-                                    <button
-                                        type="button"
-                                        className="flex flex-col gap-4 group text-left w-full h-full"
-                                        onClick={() => setActiveIndex(idx)}
-                                    >
-                                        {/* Image Placeholder with Custom Cursor */}
-                                        <div
-                                            className="w-full aspect-[4/3] bg-white/60 border border-black/10 rounded-lg overflow-hidden relative shadow-[inset_0_0_20px_rgba(0,0,0,0.02)] group-hover:border-black/30 transition-colors backdrop-blur-xl shrink-0"
-                                            style={{ cursor: getCursorSvg(theme.colors[0]) }}
-                                        >
-                                            {/* Subtle inner gradient hover effect */}
-                                            <div className="absolute inset-x-0 bottom-0 h-1 opacity-0 group-hover:opacity-100 transition-opacity" style={{ backgroundColor: theme.colors[0] }} />
-                                            <div className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity bg-gradient-to-tr from-transparent to-black/5 pointer-events-none" />
-
-                                            <img
-                                                src={item.image}
-                                                alt={item.name}
-                                                className="w-full h-full object-cover"
-                                            />
-
-                                            <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-black/20" />
-                                            <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-black/20" />
-                                        </div>
-
-                                        {/* Text Label */}
-                                        <div className="flex flex-col items-center gap-1 text-center mt-2 flex-grow">
-                                            <span className="font-sans text-base font-bold text-zinc-800 uppercase tracking-tight">
-                                                {item.name}
-                                            </span>
-                                            <span className="font-mono text-[11px] text-zinc-500 uppercase tracking-[0.3em]">
-                                                {item.company ? `${item.role} // ${item.company}` : item.role}
-                                            </span>
-                                            {item.focus && (
-                                                <span className="font-mono text-[10px] text-zinc-400 uppercase tracking-[0.35em]">
-                                                    {item.focus}
-                                                </span>
-                                            )}
-                                        </div>
-                                    </button>
-                                </ConvergingCard>
-                            </div>
-                        );
-                    })}
+                                    <div className="absolute inset-x-0 bottom-0 h-1 opacity-0 group-hover:opacity-100 transition-opacity" style={{ backgroundColor: theme.colors[0] }} />
+                                    <img
+                                        src={item.image}
+                                        alt={item.name}
+                                        className={`w-full h-full ${isNation ? 'object-cover' : 'object-contain p-4'} group-hover:scale-105 transition-transform duration-500`}
+                                    />
+                                </div>
+                                {/* Label */}
+                                <div className="flex flex-col items-center gap-0.5 text-center">
+                                    <span className="font-sans text-sm font-bold text-zinc-800 uppercase tracking-tight leading-tight">
+                                        {item.name}
+                                    </span>
+                                    <span className="font-mono text-[10px] text-zinc-500 uppercase tracking-[0.25em]">
+                                        {item.company ? `${item.role} · ${item.company}` : item.role}
+                                    </span>
+                                    {item.focus && (
+                                        <span className="font-mono text-[9px] text-zinc-400 uppercase tracking-[0.3em]">
+                                            {item.focus}
+                                        </span>
+                                    )}
+                                </div>
+                            </button>
+                        </div>
+                    ))}
                 </div>
             </div>
 

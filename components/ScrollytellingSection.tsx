@@ -6,20 +6,20 @@ import * as THREE from 'three';
 
 // --- DATA ---
 const PHRASES = [
-  { text: '🚀 Tenés un proyecto con impacto real.', x: '25%', y: '28%', mobX: '50%', mobY: '22%' },
-  { text: '🥵 Pero construir lo que no existe es agotador.', x: '75%', y: '30%', mobX: '50%', mobY: '34%' },
-  { text: '🏃 El mercado te pide que corras solo, rápido y sin mapa.', x: '28%', y: '68%', mobX: '50%', mobY: '66%' },
-  { text: '❌ Eso no debería ser así.', x: '72%', y: '68%', mobX: '50%', mobY: '78%' },
+  { text: 'Tenés un proyecto con impacto real.', x: '25%', y: '28%', mobX: '50%', mobY: '22%' },
+  { text: 'Pero construir lo que no existe es agotador.', x: '75%', y: '30%', mobX: '50%', mobY: '34%' },
+  { text: 'El mercado te pide que corras solo, rápido y sin mapa.', x: '28%', y: '68%', mobX: '50%', mobY: '66%' },
+  { text: 'Eso no debería ser así.', x: '72%', y: '68%', mobX: '50%', mobY: '78%' },
 
-  { text: '🤝 Somos un ecosistema hands on.', x: '28%', y: '28%', mobX: '50%', mobY: '22%' },
-  { text: '🌱 No te damos consejos — nos embarramos con vos.', x: '75%', y: '30%', mobX: '50%', mobY: '34%' },
-  { text: '⚡ Invertimos, aceleramos y conectamos.', x: '28%', y: '68%', mobX: '50%', mobY: '66%' },
-  { text: '📈 Tecnología con propósito. Método con resultados.', x: '75%', y: '68%', mobX: '50%', mobY: '78%' },
+  { text: 'Somos un ecosistema hands on.', x: '28%', y: '28%', mobX: '50%', mobY: '22%' },
+  { text: 'No te damos consejos — nos embarramos con vos.', x: '75%', y: '30%', mobX: '50%', mobY: '34%' },
+  { text: 'Invertimos, aceleramos y conectamos.', x: '28%', y: '68%', mobX: '50%', mobY: '66%' },
+  { text: 'Tecnología con propósito. Método con resultados.', x: '75%', y: '68%', mobX: '50%', mobY: '78%' },
 
-  { text: '💫 Nuevo mindset. Nuevo equipo. Nueva velocidad.', x: '26%', y: '30%', mobX: '50%', mobY: '22%' },
-  { text: '💎 Lo que construís hoy no es solo un negocio', x: '75%', y: '30%', mobX: '50%', mobY: '34%' },
-  { text: '🌎 Lo que construís es parte del futuro de LATAM.', x: '28%', y: '68%', mobX: '50%', mobY: '66%' },
-  { text: '🤗 Y lo construiste acompañado.', x: '75%', y: '68%', mobX: '50%', mobY: '78%' }
+  { text: 'Nuevo mindset. Nuevo equipo. Nueva velocidad.', x: '26%', y: '30%', mobX: '50%', mobY: '22%' },
+  { text: 'Lo que construís hoy no es solo un negocio', x: '75%', y: '30%', mobX: '50%', mobY: '34%' },
+  { text: 'Lo que construís es parte del futuro de LATAM.', x: '28%', y: '68%', mobX: '50%', mobY: '66%' },
+  { text: 'Y lo construiste acompañado.', x: '75%', y: '68%', mobX: '50%', mobY: '78%' }
 ];
 
 const STAGES = [

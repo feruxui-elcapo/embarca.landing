@@ -90,7 +90,7 @@ const NATION_CONTENT: SectionContent = {
             rotation: -5,
             x: -20,
             y: 10,
-            image: 'https://images.unsplash.com/photo-1542744094-3a31f272c490?auto=format&fit=crop&w=800&q=80'
+            image: '/fotos-how-we-work/Nation/Venture-en-Nation.jpg'
         },
         {
             title: 'Booster: Filtramos y aceleramos',
@@ -98,7 +98,7 @@ const NATION_CONTENT: SectionContent = {
             rotation: 4,
             x: 30,
             y: -10,
-            image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=800&q=80'
+            image: '/fotos-how-we-work/Booster/Booster.jpg'
         },
         {
             title: 'Connect: Transformamos desde dentro',
@@ -106,7 +106,15 @@ const NATION_CONTENT: SectionContent = {
             rotation: -3,
             x: -15,
             y: 20,
-            image: 'https://images.unsplash.com/photo-1573164713988-8665fc963095?auto=format&fit=crop&w=800&q=80'
+            image: '/fotos-how-we-work/Nation/Connect-en-Nation.jpg'
+        },
+        {
+            title: 'Campus Olegario',
+            text: 'Nuestro espacio de cowork en Mendoza, donde tenemos nuestras oficinas y trabajamos día a día. Acá es donde el ecosistema se encuentra y pasan las cosas que importan.',
+            rotation: 2,
+            x: 15,
+            y: -15,
+            image: '/fotos-how-we-work/Nation/Olegario.jpg'
         }
     ],
     metrics: [
@@ -126,7 +134,7 @@ const BOOSTER_CONTENT: SectionContent = {
             rotation: -5,
             x: -20,
             y: 10,
-            image: 'https://images.unsplash.com/photo-1542744094-3a31f272c490?auto=format&fit=crop&w=800&q=80'
+            image: '/fotos-how-we-work/Booster/Booster.jpg'
         },
         {
             title: 'Product Market Fit',
@@ -134,7 +142,7 @@ const BOOSTER_CONTENT: SectionContent = {
             rotation: 2,
             x: 10,
             y: -15,
-            image: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80'
+            image: '/fotos-how-we-work/Booster/Encuentro-SG-Legales.jpeg'
         },
         {
             title: '18 semanas de tracción',
@@ -142,7 +150,7 @@ const BOOSTER_CONTENT: SectionContent = {
             rotation: 4,
             x: 30,
             y: -10,
-            image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=800&q=80'
+            image: '/fotos-how-we-work/Booster/Booster.jpg'
         },
         {
             title: 'Demo Day',
@@ -150,7 +158,7 @@ const BOOSTER_CONTENT: SectionContent = {
             rotation: -4,
             x: -25,
             y: 5,
-            image: 'https://images.unsplash.com/photo-1556761175-4b46a572b786?auto=format&fit=crop&w=800&q=80'
+            image: '/fotos-how-we-work/Booster/Encuentro-SG-Legales.jpeg'
         },
         {
             title: 'Escala con propósito',
@@ -158,7 +166,7 @@ const BOOSTER_CONTENT: SectionContent = {
             rotation: -3,
             x: -15,
             y: 20,
-            image: 'https://images.unsplash.com/photo-1573164713988-8665fc963095?auto=format&fit=crop&w=800&q=80'
+            image: '/fotos-how-we-work/Booster/Booster.jpg'
         }
     ],
     metrics: [
@@ -177,7 +185,7 @@ const CONNECT_CONTENT: SectionContent = {
             rotation: -5,
             x: -20,
             y: 10,
-            image: 'https://images.unsplash.com/photo-1542744094-3a31f272c490?auto=format&fit=crop&w=800&q=80'
+            image: '/fotos-how-we-work/Connect/Connect.jpg'
         },
         {
             title: 'Profesionalizamos la gestión',
@@ -185,7 +193,7 @@ const CONNECT_CONTENT: SectionContent = {
             rotation: 4,
             x: 30,
             y: -10,
-            image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=800&q=80'
+            image: '/fotos-how-we-work/Connect/Connect2.jpeg'
         },
         {
             title: 'Conectamos con el ecosistema',
@@ -193,7 +201,7 @@ const CONNECT_CONTENT: SectionContent = {
             rotation: -3,
             x: -15,
             y: 20,
-            image: 'https://images.unsplash.com/photo-1573164713988-8665fc963095?auto=format&fit=crop&w=800&q=80'
+            image: '/fotos-how-we-work/Connect/Connect.jpg'
         }
     ],
     metrics: [
@@ -204,6 +212,24 @@ const CONNECT_CONTENT: SectionContent = {
     testimonials: CONNECT_TESTIMONIALS
 };
 
+const VC_TESTIMONIALS: Testimonial[] = [
+    {
+        quote: 'El acompañamiento de Embarca se sintió siempre muy cercano, generoso y genuino, estando presentes cada vez que enfrentamos un nuevo desafío.',
+        image: '/fotos de testimonios/Santi de Debi (1).jpg',
+        author: 'Santiago Del Peral (Debi)'
+    },
+    {
+        quote: 'Están cuando los necesitamos. Apostaron por nosotros en nuestras etapas más iniciales y volvieron a hacerlo con un follow-on.',
+        image: '/fotos de testimonios/Franco de Satellites (1).jpg',
+        author: 'Franco Rodriguez Viau (Satellites on Fire)'
+    },
+    {
+        quote: 'Sentimos que estamos en el mismo barco. Siempre que necesitamos una intro, una llamada o revisar una estrategia, estuvieron ahí. Son un aliado que siempre nos banca.',
+        image: '/fotos de testimonios/mati de wesex (1).jpg',
+        author: 'Matias Escandarani (We Sex)'
+    }
+];
+
 const VC_CONTENT: SectionContent = {
     steps: [
         {
@@ -212,7 +238,7 @@ const VC_CONTENT: SectionContent = {
             rotation: -5,
             x: -20,
             y: 10,
-            image: 'https://images.unsplash.com/photo-1542744094-3a31f272c490?auto=format&fit=crop&w=800&q=80'
+            image: '/fotos-how-we-work/Venture/DSC01287.jpg'
         },
         {
             title: 'Capital Inteligente (y cuerpo)',
@@ -220,7 +246,7 @@ const VC_CONTENT: SectionContent = {
             rotation: 4,
             x: 30,
             y: -10,
-            image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=800&q=80'
+            image: '/fotos-how-we-work/Venture/DSC01374.jpg'
         },
         {
             title: 'Networking de Impacto',
@@ -228,14 +254,15 @@ const VC_CONTENT: SectionContent = {
             rotation: -3,
             x: -15,
             y: 20,
-            image: 'https://images.unsplash.com/photo-1573164713988-8665fc963095?auto=format&fit=crop&w=800&q=80'
+            image: '/fotos-how-we-work/Venture/DSC01287.jpg'
         }
     ],
     metrics: [
         '2 fondos operativos',
         '33 startups invertidas',
         '+40 inversores'
-    ]
+    ],
+    testimonials: VC_TESTIMONIALS
 };
 
 const DEFAULT_CONTENT: SectionContent = {
@@ -246,7 +273,7 @@ const DEFAULT_CONTENT: SectionContent = {
             rotation: -5,
             x: -20,
             y: 10,
-            image: 'https://images.unsplash.com/photo-1542744094-3a31f272c490?auto=format&fit=crop&w=800&q=80'
+            image: '/fotos-how-we-work/Booster/Booster.jpg'
         },
         {
             title: 'Transformamos desde dentro',
@@ -254,7 +281,7 @@ const DEFAULT_CONTENT: SectionContent = {
             rotation: 4,
             x: 30,
             y: -10,
-            image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=800&q=80'
+            image: '/fotos-how-we-work/Connect/Connect.jpg'
         },
         {
             title: 'Conectamos capital y propósito',
@@ -262,7 +289,7 @@ const DEFAULT_CONTENT: SectionContent = {
             rotation: -3,
             x: -15,
             y: 20,
-            image: 'https://images.unsplash.com/photo-1573164713988-8665fc963095?auto=format&fit=crop&w=800&q=80'
+            image: '/fotos-how-we-work/Venture/DSC01287.jpg'
         }
     ],
     metrics: [
@@ -280,6 +307,12 @@ export const HowWeWorkSection: React.FC<HowWeWorkProps> = ({ theme, district = D
     const [metricSlideProgress, setMetricSlideProgress] = useState(0);
     const [testimonialActiveSlide, setTestimonialActiveSlide] = useState(0);
     const [testimonialSlideProgress, setTestimonialSlideProgress] = useState(0);
+    const [nationTestimonials] = useState(() => {
+        const randomBooster = BOOSTER_TESTIMONIALS[Math.floor(Math.random() * BOOSTER_TESTIMONIALS.length)];
+        const randomConnect = CONNECT_TESTIMONIALS[Math.floor(Math.random() * CONNECT_TESTIMONIALS.length)];
+        const randomVC = VC_TESTIMONIALS[Math.floor(Math.random() * VC_TESTIMONIALS.length)];
+        return [randomBooster, randomConnect, randomVC].sort(() => Math.random() - 0.5);
+    });
 
     const contentByDistrict: Partial<Record<District, SectionContent>> = {
         [District.NATION]: NATION_CONTENT,
@@ -288,7 +321,7 @@ export const HowWeWorkSection: React.FC<HowWeWorkProps> = ({ theme, district = D
         [District.VC]: VC_CONTENT
     };
     const sectionContent = contentByDistrict[district] || DEFAULT_CONTENT;
-    const currentTestimonials = sectionContent.testimonials || DEFAULT_TESTIMONIALS;
+    const currentTestimonials = district === District.NATION ? nationTestimonials : (sectionContent.testimonials || DEFAULT_TESTIMONIALS);
 
     const activeMetric = sectionContent.metrics[metricActiveSlide] || '';
     const metricMatch = activeMetric.match(/[+]?\d[\d.,]*/);
@@ -366,7 +399,7 @@ export const HowWeWorkSection: React.FC<HowWeWorkProps> = ({ theme, district = D
     return (
         <section 
             ref={sectionRef} 
-            className={`w-full px-[40px] py-32 relative z-20 border-t border-white/10 overflow-hidden transition-colors duration-500 ${
+            className={`w-full px-[40px] py-16 relative z-20 border-t border-white/10 overflow-hidden transition-colors duration-500 ${
                 district === District.NATION ? 'bg-black' : ''
             }`}
         >
@@ -390,9 +423,9 @@ export const HowWeWorkSection: React.FC<HowWeWorkProps> = ({ theme, district = D
                             initialRotation={step.rotation}
                         >
                             <div
-                                className="bg-black/15 border border-white/20 rounded-xl p-0 flex flex-col md:flex-row items-stretch text-left group hover:border-white/40 transition-colors shadow-lg relative overflow-hidden backdrop-blur-xl"
+                                className="bg-black/15 border border-white/20 rounded-xl p-0 flex flex-col md:flex-row items-stretch text-left group hover:border-white/40 transition-colors shadow-lg relative overflow-hidden backdrop-blur-xl md:h-[180px]"
                             >
-                                <div className="w-full md:w-2/5 h-48 md:h-auto min-h-[200px] relative overflow-hidden shrink-0">
+                                <div className="w-full md:w-1/3 h-36 md:h-full relative overflow-hidden shrink-0">
                                     <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors z-10" />
                                     <img 
                                         src={step.image} 
@@ -400,16 +433,16 @@ export const HowWeWorkSection: React.FC<HowWeWorkProps> = ({ theme, district = D
                                         className="absolute inset-0 w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
                                     />
                                 </div>
-                                <div className="p-8 md:p-10 flex flex-col items-start w-full md:w-3/5">
+                                <div className="p-5 md:p-6 flex flex-col justify-center items-start w-full md:w-2/3">
                                     <div
                                         className="absolute inset-x-0 bottom-0 h-1 opacity-0 group-hover:opacity-20 transition-opacity"
                                         style={{ backgroundColor: theme.colors[0] }}
                                     />
 
-                                    <h3 className="font-sans text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4 tracking-tight uppercase">
+                                    <h3 className="font-sans text-lg sm:text-xl md:text-2xl font-bold text-white mb-2 tracking-tight uppercase">
                                         {step.title}
                                     </h3>
-                                    <p className="font-mono text-xs sm:text-sm md:text-base lg:text-lg text-zinc-100 leading-relaxed uppercase tracking-widest">
+                                    <p className="font-mono text-xs text-zinc-200 leading-relaxed">
                                         {step.text}
                                     </p>
 
