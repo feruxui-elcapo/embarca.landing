@@ -25,7 +25,7 @@ const DistrictModel = React.lazy(() =>
 const DISTRICT_DATA: Record<District, DistrictTheme> = {
   [District.NATION]: {
     name: 'EMBARCA NATION',
-    description: 'No solo ponemos capital — ponemos equipo, método y comunidad. El ecosistema tech que está construyendo el futuro de LATAM.',
+    description: 'Impulsamos a emprendedores extraordinarios. Sumamos capital, metodología y red.',
     colors: ['#52D8D6'],
     accent: '#52D8D6',
     icon: 'sun'
