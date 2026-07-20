@@ -14,6 +14,7 @@ type StepItem = {
     x: number;
     y: number;
     image: string;
+    objectPosition?: string;
 };
 
 type Testimonial = {
@@ -98,7 +99,8 @@ const NATION_CONTENT: SectionContent = {
             rotation: 4,
             x: 30,
             y: -10,
-            image: '/fotos-how-we-work/Booster/Booster.jpg'
+            image: '/fotos-how-we-work/Booster/Booster.jpg',
+            objectPosition: 'object-bottom'
         },
         {
             title: 'Connect: Transformamos desde dentro',
@@ -134,7 +136,8 @@ const BOOSTER_CONTENT: SectionContent = {
             rotation: -5,
             x: -20,
             y: 10,
-            image: '/fotos-how-we-work/Booster/Booster.jpg'
+            image: '/fotos-how-we-work/Booster/Booster.jpg',
+            objectPosition: 'object-bottom'
         },
         {
             title: 'Product Market Fit',
@@ -150,7 +153,8 @@ const BOOSTER_CONTENT: SectionContent = {
             rotation: 4,
             x: 30,
             y: -10,
-            image: '/fotos-how-we-work/Booster/Booster.jpg'
+            image: '/fotos-how-we-work/Booster/Booster.jpg',
+            objectPosition: 'object-bottom'
         },
         {
             title: 'Demo Day',
@@ -166,7 +170,8 @@ const BOOSTER_CONTENT: SectionContent = {
             rotation: -3,
             x: -15,
             y: 20,
-            image: '/fotos-how-we-work/Booster/Booster.jpg'
+            image: '/fotos-how-we-work/Booster/Booster.jpg',
+            objectPosition: 'object-bottom'
         }
     ],
     metrics: [
@@ -273,7 +278,8 @@ const DEFAULT_CONTENT: SectionContent = {
             rotation: -5,
             x: -20,
             y: 10,
-            image: '/fotos-how-we-work/Booster/Booster.jpg'
+            image: '/fotos-how-we-work/Booster/Booster.jpg',
+            objectPosition: 'object-bottom'
         },
         {
             title: 'Transformamos desde dentro',
@@ -430,7 +436,7 @@ export const HowWeWorkSection: React.FC<HowWeWorkProps> = ({ theme, district = D
                                     <img 
                                         src={step.image} 
                                         alt={step.title} 
-                                        className="absolute inset-0 w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
+                                        className={`absolute inset-0 w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 ${step.objectPosition || 'object-center'}`}
                                     />
                                 </div>
                                 <div className="p-5 md:p-6 flex flex-col justify-center items-start w-full md:w-2/3">
