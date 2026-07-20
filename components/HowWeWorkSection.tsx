@@ -15,6 +15,7 @@ type StepItem = {
     y: number;
     image: string;
     objectPosition?: string;
+    objectFit?: string;
 };
 
 type Testimonial = {
@@ -100,7 +101,7 @@ const NATION_CONTENT: SectionContent = {
             x: 30,
             y: -10,
             image: '/fotos-how-we-work/Booster/Booster.jpg',
-            objectPosition: 'object-bottom'
+            objectFit: 'object-contain'
         },
         {
             title: 'Connect: Transformamos desde dentro',
@@ -137,7 +138,7 @@ const BOOSTER_CONTENT: SectionContent = {
             x: -20,
             y: 10,
             image: '/fotos-how-we-work/Booster/Booster.jpg',
-            objectPosition: 'object-bottom'
+            objectFit: 'object-contain'
         },
         {
             title: 'Product Market Fit',
@@ -154,7 +155,7 @@ const BOOSTER_CONTENT: SectionContent = {
             x: 30,
             y: -10,
             image: '/fotos-how-we-work/Booster/Booster.jpg',
-            objectPosition: 'object-bottom'
+            objectFit: 'object-contain'
         },
         {
             title: 'Demo Day',
@@ -171,7 +172,7 @@ const BOOSTER_CONTENT: SectionContent = {
             x: -15,
             y: 20,
             image: '/fotos-how-we-work/Booster/Booster.jpg',
-            objectPosition: 'object-bottom'
+            objectFit: 'object-contain'
         }
     ],
     metrics: [
@@ -279,7 +280,7 @@ const DEFAULT_CONTENT: SectionContent = {
             x: -20,
             y: 10,
             image: '/fotos-how-we-work/Booster/Booster.jpg',
-            objectPosition: 'object-bottom'
+            objectFit: 'object-contain'
         },
         {
             title: 'Transformamos desde dentro',
@@ -431,12 +432,12 @@ export const HowWeWorkSection: React.FC<HowWeWorkProps> = ({ theme, district = D
                             <div
                                 className="bg-black/15 border border-white/20 rounded-xl p-0 flex flex-col md:flex-row items-stretch text-left group hover:border-white/40 transition-colors shadow-lg relative overflow-hidden backdrop-blur-xl md:h-[180px]"
                             >
-                                <div className="w-full md:w-1/3 h-36 md:h-full relative overflow-hidden shrink-0">
+                                <div className="w-full md:w-1/3 h-36 md:h-full relative overflow-hidden shrink-0 bg-black">
                                     <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors z-10" />
                                     <img 
                                         src={step.image} 
                                         alt={step.title} 
-                                        className={`absolute inset-0 w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 ${step.objectPosition || 'object-center'}`}
+                                        className={`absolute inset-0 w-full h-full transform group-hover:scale-105 transition-transform duration-700 ${step.objectFit || 'object-cover'} ${step.objectPosition || 'object-center'}`}
                                     />
                                 </div>
                                 <div className="p-5 md:p-6 flex flex-col justify-center items-start w-full md:w-2/3">

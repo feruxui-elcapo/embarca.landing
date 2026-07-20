@@ -66,7 +66,7 @@ const DISTRICT_PROTAGONISTS: Record<District, Protagonist[]> = {
         role: 'Partner',
         company: 'Embarca',
         focus: 'Venture',
-        image: '/fotos-de-protagonistas/nuevas-fotos/valen.png',
+        image: '/fotos-de-protagonistas/nuevas-fotos/valen_v2.png',
         stats: ['Escala', 'Manija', 'Aventurera'],
         story: [
             { title: 'Estudios', text: 'Lic. en Administración de Empresas' },
@@ -79,7 +79,7 @@ const DISTRICT_PROTAGONISTS: Record<District, Protagonist[]> = {
         role: 'Partner',
         company: 'Embarca',
         focus: 'Embarca',
-        image: '/fotos-de-protagonistas/nuevas-fotos/gonza.png',
+        image: '/fotos-de-protagonistas/nuevas-fotos/gonza_v2.png',
         stats: ['Intergaláctico', 'Reflexivo', 'Disruptivo'],
         story: [
             { title: 'Estudios', text: 'Ingeniero Industrial, MBA y Máster en Mercados Financieros' },
