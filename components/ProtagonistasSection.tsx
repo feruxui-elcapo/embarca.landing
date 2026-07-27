@@ -102,13 +102,13 @@ const DISTRICT_PROTAGONISTS: Record<District, Protagonist[]> = {
     },
     {
         name: 'Gise Paez',
-        role: 'Administración',
+        role: 'Contadora Pública Nacional',
         company: 'Embarca',
         focus: 'Campus Olegario - Embarca',
         image: '/fotos-de-protagonistas/GISE.jpg',
         stats: ['Observadora', 'Ordenada', 'Considerada'],
         story: [
-            { title: 'Estudios', text: 'Licenciada en Administración.' },
+            { title: 'Estudios', text: 'Contadora Pública Nacional.' },
             { title: 'Propósito', text: 'Poder aprender de la gente que me rodea.' },
             { title: 'Dato curioso', text: 'Estuve en la portada de un diario de la India.' }
         ]
