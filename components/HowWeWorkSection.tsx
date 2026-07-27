@@ -100,8 +100,7 @@ const NATION_CONTENT: SectionContent = {
             rotation: 4,
             x: 30,
             y: -10,
-            image: '/fotos-how-we-work/Booster/Booster.jpg',
-            objectFit: 'object-contain'
+            image: '/fotos-how-we-work/Nation/Booster-en-Nation.jpg'
         },
         {
             title: 'Connect: Transformamos desde dentro',
@@ -132,15 +131,16 @@ const NATION_CONTENT: SectionContent = {
 const BOOSTER_CONTENT: SectionContent = {
     steps: [
         {
+            // Sala llena Embarca Nation → el programa real, sin filtros
             title: 'Menos teoría, más barro',
             text: 'Seleccionamos equipos con propósito y tecnologías disruptivas que no temen iterar para transformar su ciencia en un negocio real.',
             rotation: -5,
             x: -20,
             y: 10,
-            image: '/fotos-how-we-work/Booster/Booster.jpg',
-            objectFit: 'object-contain'
+            image: '/fotos-how-we-work/Nation/Booster-en-Nation.jpg'
         },
         {
+            // TODO: necesita foto específica de PMF (validación con clientes)
             title: 'Product Market Fit',
             text: 'Te ayudamos a validar tu propuesta de valor trabajando de cerca con tus clientes para asegurar que estás construyendo algo que realmente necesitan.',
             rotation: 2,
@@ -149,15 +149,16 @@ const BOOSTER_CONTENT: SectionContent = {
             image: '/fotos-how-we-work/Booster/Encuentro-SG-Legales.jpeg'
         },
         {
+            // Selfie grupal en domo geodésico → equipo unido, tracción colectiva
             title: '18 semanas de tracción',
             text: 'Ejecutamos un proceso intenso de acompañamiento donde expertos que ya recorrieron el camino te ayudan a mover la aguja. - teoría +acción',
             rotation: 4,
             x: 30,
             y: -10,
-            image: '/fotos-how-we-work/Booster/Booster.jpg',
-            objectFit: 'object-contain'
+            image: '/fotos-how-we-work/Booster/Booster-original.jpg'
         },
         {
+            // Reunión de trabajo → encuentro cara a cara antes del pitch
             title: 'Demo Day',
             text: 'Preparamos y presentamos tu pitch ante una red cerrada de inversores clave, conectando tu tracción con el capital necesario para crecer.',
             rotation: -4,
@@ -166,13 +167,13 @@ const BOOSTER_CONTENT: SectionContent = {
             image: '/fotos-how-we-work/Booster/Encuentro-SG-Legales.jpeg'
         },
         {
+            // Pasaporte / logo Embarca → identidad y escala del programa
             title: 'Escala con propósito',
             text: 'Conectamos tu proyecto con el ecosistema global para asegurar un camino claro hacia el levantamiento de capital o un modelo de crecimiento sostenible.',
             rotation: -3,
             x: -15,
             y: 20,
-            image: '/fotos-how-we-work/Booster/Booster.jpg',
-            objectFit: 'object-contain'
+            image: '/fotos-how-we-work/Booster/Booster.jpg'
         }
     ],
     metrics: [
@@ -186,14 +187,16 @@ const BOOSTER_CONTENT: SectionContent = {
 const CONNECT_CONTENT: SectionContent = {
     steps: [
         {
+            // Sala con audiencia → primera toma de contacto, selección y match
             title: 'Ordenamos la estrategia',
             text: 'Trabajamos con founders y equipos directivos para definir visión, prioridades y foco utilizando sistemas de gestión como OKR y Traction (EOS).',
             rotation: -5,
             x: -20,
             y: 10,
-            image: '/fotos-how-we-work/Connect/Connect.jpg'
+            image: '/fotos-how-we-work/Connect/Connect-original.jpg'
         },
         {
+            // Reunión íntima de trabajo → acompañamiento codo a codo
             title: 'Profesionalizamos la gestión',
             text: 'Acompañamos la evolución de las empresas incorporando prácticas de gobernanza, directorios estratégicos y procesos de toma de decisiones.',
             rotation: 4,
@@ -202,6 +205,7 @@ const CONNECT_CONTENT: SectionContent = {
             image: '/fotos-how-we-work/Connect/Connect2.jpeg'
         },
         {
+            // Grupo amplio → red ampliada, ecosistema conectado
             title: 'Conectamos con el ecosistema',
             text: 'Activamos vínculos con mentores, aliados estratégicos y talento dentro de la red Embarca.',
             rotation: -3,
@@ -239,28 +243,31 @@ const VC_TESTIMONIALS: Testimonial[] = [
 const VC_CONTENT: SectionContent = {
     steps: [
         {
+            // Sala con audiencia en mesas redondas → evaluación y selección de tesis
             title: 'Tesis y Match',
             text: 'Invertimos en emprendedores extraordinarios cuyas tecnologías disruptivas resuelvan problemas esenciales. Somos agnósticos pero preferimos compañías con modelos de negocio que generen impacto en tres ejes: crecimiento económico, protección y regeneración ambiental; desarrollo de comunidades en Latam.',
             rotation: -5,
             x: -20,
             y: 10,
-            image: '/fotos-how-we-work/Venture/DSC01287.jpg'
+            image: '/fotos-how-we-work/Connect/Connect-original.jpg'
         },
         {
+            // Reunión de trabajo íntima → capital + equipo codo a codo
             title: 'Capital Inteligente (y cuerpo)',
             text: 'Ponemos capital y equipo a startups en un estadío pre-seed. Trabajamos codo a codo en la estrategia de crecimiento, el orden del cap table y la preparación para las siguientes rondas de inversión. Somos el socio que te ayuda a pensar el negocio a largo plazo.',
             rotation: 4,
             x: 30,
             y: -10,
-            image: '/fotos-how-we-work/Venture/DSC01374.jpg'
+            image: '/fotos-how-we-work/Connect/Connect2.jpeg'
         },
         {
+            // Grupo amplio en evento → red de founders e inversores
             title: 'Networking de Impacto',
             text: 'Nadie escala solo. Te integramos a un ecosistema de founders y expertos que hablan tu mismo idioma y comparten tus mismos dolores. Te conectamos con los que ya recorrieron el camino para que tus decisiones tengan menos teoría y más experiencia real.',
             rotation: -3,
             x: -15,
             y: 20,
-            image: '/fotos-how-we-work/Venture/DSC01287.jpg'
+            image: '/fotos-how-we-work/Connect/Connect.jpg'
         }
     ],
     metrics: [
@@ -279,8 +286,7 @@ const DEFAULT_CONTENT: SectionContent = {
             rotation: -5,
             x: -20,
             y: 10,
-            image: '/fotos-how-we-work/Booster/Booster.jpg',
-            objectFit: 'object-contain'
+            image: '/fotos-how-we-work/Booster/Encuentro-SG-Legales.jpeg'
         },
         {
             title: 'Transformamos desde dentro',
@@ -288,7 +294,7 @@ const DEFAULT_CONTENT: SectionContent = {
             rotation: 4,
             x: 30,
             y: -10,
-            image: '/fotos-how-we-work/Connect/Connect.jpg'
+            image: '/fotos-how-we-work/Connect/Connect2.jpeg'
         },
         {
             title: 'Conectamos capital y propósito',
@@ -296,7 +302,7 @@ const DEFAULT_CONTENT: SectionContent = {
             rotation: -3,
             x: -15,
             y: 20,
-            image: '/fotos-how-we-work/Venture/DSC01287.jpg'
+            image: '/fotos-how-we-work/Venture/DSC01374.jpg'
         }
     ],
     metrics: [
