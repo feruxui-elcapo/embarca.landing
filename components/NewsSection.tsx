@@ -5,6 +5,8 @@ import { ArrowUpRight, CalendarDays, Sparkles, MapPin, Share2, X, ArrowLeft } fr
 import { PixelButton } from './PixelButton';
 import { ConvergingCard } from './ConvergingCard';
 import { NewsItem, getFallbackNews, subscribeToNews } from './newsData';
+import { ShareNewsButton } from './ShareNewsButton';
+import { getNewsIdFromLocation, clearNewsIdFromLocation } from './shareLinks';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface NewsSectionProps {
@@ -69,6 +71,8 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ theme, currentDistrict
   const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
   const [selectedNewsId, setSelectedNewsId] = useState<string | null>(null);
+  // Id de novedad recibido por link compartido (?novedad=, #novedad- o /novedad/)
+  const pendingDeepLinkRef = useRef<string | null>(getNewsIdFromLocation());
   
   const [spotifySrc, setSpotifySrc] = useState('https://open.spotify.com/embed/track/0mBKv9DkYfQHjdMcw2jdyI?utm_source=generator');
   const [youtubeSrc, setYoutubeSrc] = useState('https://www.youtube.com/embed/1yb-tnuaEoI');
@@ -194,6 +198,25 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ theme, currentDistrict
     setSelectedNewsId(newsId);
     window.history.pushState({ modalOpen: true }, '', `#novedad-${newsId}`);
   };
+
+  // Abre la novedad recibida por link compartido cuando ya está disponible
+  useEffect(() => {
+    const id = pendingDeepLinkRef.current;
+    if (!id) return;
+    const exists = newsItems.some(n => n.id === id) || [
+      ...getFallbackNews(District.NATION),
+      ...getFallbackNews(District.BOOSTER),
+      ...getFallbackNews(District.CONNECT),
+      ...getFallbackNews(District.VC)
+    ].some(n => n.id === id);
+    if (!exists) return;
+
+    pendingDeepLinkRef.current = null;
+    // Deja la landing limpia en el historial para que "Volver" no saque al usuario del sitio
+    clearNewsIdFromLocation();
+    sectionRef.current?.scrollIntoView({ behavior: 'instant' as ScrollBehavior, block: 'start' });
+    openNews(id);
+  }, [newsItems]);
 
   const closeNews = () => {
     setSelectedNewsId(null);
@@ -412,9 +435,16 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ theme, currentDistrict
                          {news.district || 'NATION'}
                       </div>
 
-                      <button className="w-10 h-10 rounded-full flex items-center justify-center bg-zinc-50 group-hover:bg-zinc-900 group-hover:text-white transition-colors duration-300 text-zinc-400">
-                        <ArrowUpRight size={18} className="transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <ShareNewsButton
+                          newsId={news.id}
+                          title={news.title}
+                          className="w-10 h-10 rounded-full flex items-center justify-center bg-zinc-50 hover:bg-zinc-200 text-zinc-400 hover:text-zinc-900 transition-colors duration-300"
+                        />
+                        <button className="w-10 h-10 rounded-full flex items-center justify-center bg-zinc-50 group-hover:bg-zinc-900 group-hover:text-white transition-colors duration-300 text-zinc-400">
+                          <ArrowUpRight size={18} className="transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                        </button>
+                      </div>
                     </div>
                   </div>
 
@@ -494,10 +524,18 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ theme, currentDistrict
                      <ArrowLeft size={16} />
                      Volver
                    </button>
-                   <span className="font-mono text-[10px] text-zinc-400 uppercase tracking-[0.2em] flex items-center gap-2">
-                     <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
-                     Novedad
-                   </span>
+                   <div className="flex items-center gap-4">
+                     <span className="font-mono text-[10px] text-zinc-400 uppercase tracking-[0.2em] flex items-center gap-2">
+                       <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
+                       Novedad
+                     </span>
+                     <ShareNewsButton
+                       newsId={selectedNews.id}
+                       title={selectedNews.title}
+                       label="Compartir"
+                       className="flex items-center gap-2 p-2 px-4 bg-zinc-900 hover:bg-zinc-700 text-white rounded-full transition-colors text-sm font-sans font-bold tracking-tight"
+                     />
+                   </div>
                 </div>
 
                 {/* Modal Content */}
@@ -564,7 +602,38 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ theme, currentDistrict
                        {(!selectedNews.blocks || selectedNews.blocks.length === 0) && (
                          <div className="text-zinc-600 font-sans leading-relaxed text-xl" dangerouslySetInnerHTML={{ __html: selectedNews.summary || 'Sin contenido adicional.' }} />
                        )}
+
+                       {selectedNews.type === 'event' && selectedNews.description && (
+                         <p className="text-zinc-600 font-sans leading-relaxed text-lg whitespace-pre-line mt-8">{selectedNews.description}</p>
+                       )}
                      </div>
+
+                     {selectedNews.type === 'event' && (selectedNews.time || selectedNews.location) && (
+                       <div className="flex flex-wrap gap-6 mt-10 font-mono text-sm text-zinc-600">
+                         {selectedNews.time && (
+                           <span className="flex items-center gap-2"><CalendarDays size={16} /> {selectedNews.date} · {selectedNews.time} hs</span>
+                         )}
+                         {selectedNews.location && (
+                           selectedNews.locationLink ? (
+                             <a href={selectedNews.locationLink} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:underline"><MapPin size={16} /> {selectedNews.location}</a>
+                           ) : (
+                             <span className="flex items-center gap-2"><MapPin size={16} /> {selectedNews.location}</span>
+                           )
+                         )}
+                       </div>
+                     )}
+
+                     {(selectedNews.inscriptionUrl || (selectedNews.isExternal && selectedNews.externalUrl)) && (
+                       <a
+                         href={selectedNews.inscriptionUrl || selectedNews.externalUrl}
+                         target="_blank"
+                         rel="noopener noreferrer"
+                         className="inline-flex items-center gap-2 mt-10 px-6 py-3 bg-zinc-900 hover:bg-zinc-700 text-white rounded-full font-sans font-bold text-sm uppercase tracking-widest transition-colors"
+                       >
+                         {selectedNews.inscriptionUrl ? 'Inscribirme' : 'Leer nota completa'}
+                         <ArrowUpRight size={16} />
+                       </a>
+                     )}
                    </div>
                 </div>
               </motion.div>

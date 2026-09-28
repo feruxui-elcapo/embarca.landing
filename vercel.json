@@ -1,0 +1,5 @@
+{
+  "rewrites": [
+    { "source": "/novedad/:id", "destination": "/api/novedad?id=:id" }
+  ]
+}

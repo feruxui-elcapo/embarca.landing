@@ -1,8 +1,9 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { District, Author } from '../types';
 import { PixelButton } from './PixelButton';
-import { Trash2, Edit2, LogOut, X, Plus, Save, AlignLeft, Image as ImageIcon, ChevronLeft, Filter } from 'lucide-react';
+import { Trash2, Edit2, LogOut, X, Plus, Save, AlignLeft, Image as ImageIcon, ChevronLeft, Filter, Link as LinkIcon } from 'lucide-react';
 import { NewsItem, NewsBlock, loadNewsItems, saveNewsItems, subscribeToNews, saveNewsItemToFirebase, deleteNewsItemFromFirebase } from './newsData';
+import { getNewsShareUrl, copyToClipboard } from './shareLinks';
 import { collection, doc, setDoc, getDoc, deleteDoc, onSnapshot } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { signInWithPopup, signOut, onAuthStateChanged } from 'firebase/auth';
@@ -246,6 +247,11 @@ export const AdminPanel = ({ onExit }: { onExit?: () => void }) => {
     }
   };
 
+  const handleCopyShareLink = async (id: string) => {
+    const ok = await copyToClipboard(getNewsShareUrl(id));
+    showToast(ok ? 'Link copiado. Listo para compartir.' : 'No se pudo copiar el link', ok ? 'success' : 'error');
+  };
+
   const handleDelete = async (id: string) => {
     if (confirm('¿Seguro que deseas eliminar?')) {
       try {
@@ -474,6 +480,7 @@ export const AdminPanel = ({ onExit }: { onExit?: () => void }) => {
                       <div className="flex flex-col gap-2">
                         <button onClick={() => handleEdit(item)} className="p-2 bg-zinc-800 hover:bg-cyan-900/50 text-white hover:text-cyan-400 rounded-lg transition"><Edit2 size={16} /></button>
                         <button onClick={() => handleDelete(item.id)} className="p-2 bg-zinc-800 hover:bg-red-900/50 text-white hover:text-red-400 rounded-lg transition"><Trash2 size={16} /></button>
+                        <button onClick={() => handleCopyShareLink(item.id)} title="Copiar link para compartir" className="p-2 bg-zinc-800 hover:bg-green-900/50 text-white hover:text-green-400 rounded-lg transition"><LinkIcon size={16} /></button>
                       </div>
                     </div>
                   </div>
