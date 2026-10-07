@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { District, DistrictTheme } from '../types';
 import { ConvergingCard } from './ConvergingCard';
+import { useSectionScrollProgress } from './useSectionScrollProgress';
 
 interface HowWeWorkProps {
     theme: DistrictTheme;
@@ -313,13 +314,38 @@ const DEFAULT_CONTENT: SectionContent = {
     ]
 };
 
+const SLIDE_DURATION = 5000;
+
+// Barras de progreso tipo "stories": la activa se llena con una animación CSS lineal y al
+// terminar avisa para pasar al siguiente slide. Así la sección solo re-renderiza al cambiar
+// de slide (antes eran dos setInterval de 50ms re-renderizando todo 40 veces por segundo).
+const StoryProgressBars: React.FC<{ count: number; active: number; cycleKey: string; onComplete: () => void }> = ({ count, active, cycleKey, onComplete }) => (
+    <div className="absolute top-4 inset-x-4 flex gap-2">
+        {Array.from({ length: count }).map((_, idx) => (
+            <div key={idx} className="h-1 flex-1 bg-white/30 rounded-full overflow-hidden">
+                {idx === active ? (
+                    <div
+                        key={cycleKey}
+                        className="h-full w-full bg-white origin-left"
+                        style={{ animation: `embarca-story-progress ${SLIDE_DURATION}ms linear forwards` }}
+                        onAnimationEnd={onComplete}
+                    />
+                ) : (
+                    <div
+                        className="h-full w-full bg-white origin-left"
+                        style={{ transform: idx < active ? 'scaleX(1)' : 'scaleX(0)' }}
+                    />
+                )}
+            </div>
+        ))}
+    </div>
+);
+
 export const HowWeWorkSection: React.FC<HowWeWorkProps> = ({ theme, district = District.NATION }) => {
     const sectionRef = useRef<HTMLElement>(null);
-    const [scrollProgress, setScrollProgress] = useState(0);
+    const scrollProgress = useSectionScrollProgress(sectionRef);
     const [metricActiveSlide, setMetricActiveSlide] = useState(0);
-    const [metricSlideProgress, setMetricSlideProgress] = useState(0);
     const [testimonialActiveSlide, setTestimonialActiveSlide] = useState(0);
-    const [testimonialSlideProgress, setTestimonialSlideProgress] = useState(0);
     const [nationTestimonials] = useState(() => {
         const randomBooster = BOOSTER_TESTIMONIALS[Math.floor(Math.random() * BOOSTER_TESTIMONIALS.length)];
         const randomConnect = CONNECT_TESTIMONIALS[Math.floor(Math.random() * CONNECT_TESTIMONIALS.length)];
@@ -348,66 +374,19 @@ export const HowWeWorkSection: React.FC<HowWeWorkProps> = ({ theme, district = D
 
     useEffect(() => {
         setMetricActiveSlide(0);
-        setMetricSlideProgress(0);
         setTestimonialActiveSlide(0);
-        setTestimonialSlideProgress(0);
     }, [district]);
 
-    useEffect(() => {
-        let isVisible = false;
-        const observer = new IntersectionObserver((entries) => {
-            isVisible = entries[0].isIntersecting;
-        }, { threshold: 0 });
+    const metricsCount = sectionContent.metrics.length;
+    const testimonialsCount = currentTestimonials.length;
+    const nextMetric = () => setMetricActiveSlide((current) => (current + 1) % metricsCount);
+    const nextTestimonial = () => setTestimonialActiveSlide((current) => (current + 1) % testimonialsCount);
 
-        if (sectionRef.current) observer.observe(sectionRef.current);
-
-        const handleScroll = () => {
-            if (!sectionRef.current || !isVisible) return;
-            const rect = sectionRef.current.getBoundingClientRect();
-            const windowHeight = window.innerHeight;
-            const progress = Math.min(1, Math.max(0, (windowHeight * 0.8 - rect.top) / (rect.height * 0.6)));
-            setScrollProgress(progress);
-        };
-
-        window.addEventListener('scroll', handleScroll, { passive: true });
-        handleScroll();
-        return () => {
-            window.removeEventListener('scroll', handleScroll);
-            observer.disconnect();
-        };
-    }, []);
-
-    // Metrics carousel logic (same progressive behavior as phrase cards)
-    const SLIDE_DURATION = 5000;
-    const UPDATE_INTERVAL = 50;
-
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setMetricSlideProgress((prev) => {
-                if (prev >= 100) {
-                    setMetricActiveSlide((current) => (current + 1) % sectionContent.metrics.length);
-                    return 0;
-                }
-                return prev + (100 / (SLIDE_DURATION / UPDATE_INTERVAL));
-            });
-        }, UPDATE_INTERVAL);
-
-        return () => clearInterval(interval);
-    }, [sectionContent.metrics.length]);
-
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setTestimonialSlideProgress((prev) => {
-                if (prev >= 100) {
-                    setTestimonialActiveSlide((current) => (current + 1) % currentTestimonials.length);
-                    return 0;
-                }
-                return prev + (100 / (SLIDE_DURATION / UPDATE_INTERVAL));
-            });
-        }, UPDATE_INTERVAL);
-
-        return () => clearInterval(interval);
-    }, []);
+    // En Nation la sección es bg-black opaco: desenfocar negro da negro, así que el
+    // backdrop-blur ahí no se ve pero obliga a la GPU a recalcularlo en cada cuadro.
+    const isOpaqueSection = district === District.NATION;
+    const blurXl = isOpaqueSection ? '' : ' backdrop-blur-xl';
+    const blurMd = isOpaqueSection ? '' : ' backdrop-blur-md';
 
     return (
         <section 
@@ -436,7 +415,7 @@ export const HowWeWorkSection: React.FC<HowWeWorkProps> = ({ theme, district = D
                             initialRotation={step.rotation}
                         >
                             <div
-                                className="bg-black/15 border border-white/20 rounded-xl p-0 flex flex-col md:flex-row items-stretch text-left group hover:border-white/40 transition-colors shadow-lg relative overflow-hidden backdrop-blur-xl md:h-[180px]"
+                                className={`bg-black/15 border border-white/20 rounded-xl p-0 flex flex-col md:flex-row items-stretch text-left group hover:border-white/40 transition-colors shadow-lg relative overflow-hidden${blurXl} md:h-[180px]`}
                             >
                                 <div className="w-full md:w-1/3 h-36 md:h-full relative overflow-hidden shrink-0 bg-black">
                                     <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors z-10" />
@@ -479,19 +458,13 @@ export const HowWeWorkSection: React.FC<HowWeWorkProps> = ({ theme, district = D
                         initialRotation={5}
                         className="w-full flex-1 flex flex-col"
                     >
-                        <div className="bg-black/15 border border-white/20 p-10 rounded-2xl flex flex-col items-center text-center relative overflow-hidden backdrop-blur-md shadow-xl transition-all justify-center flex-1 min-h-[320px]">
-                            <div className="absolute top-4 inset-x-4 flex gap-2">
-                                {sectionContent.metrics.map((_, idx) => (
-                                    <div key={idx} className="h-1 flex-1 bg-white/30 rounded-full overflow-hidden">
-                                        <div
-                                            className="h-full bg-white transition-all duration-75"
-                                            style={{
-                                                width: idx === metricActiveSlide ? `${metricSlideProgress}%` : idx < metricActiveSlide ? '100%' : '0%'
-                                            }}
-                                        />
-                                    </div>
-                                ))}
-                            </div>
+                        <div className={`bg-black/15 border border-white/20 p-10 rounded-2xl flex flex-col items-center text-center relative overflow-hidden${blurMd} shadow-xl transition-all justify-center flex-1 min-h-[320px]`}>
+                            <StoryProgressBars
+                                count={metricsCount}
+                                active={metricActiveSlide}
+                                cycleKey={`${district}-${metricActiveSlide}`}
+                                onComplete={nextMetric}
+                            />
 
                             <div className="font-mono text-[10px] uppercase tracking-[0.35em] text-white/50 mb-4">
                                 impacto
@@ -515,20 +488,14 @@ export const HowWeWorkSection: React.FC<HowWeWorkProps> = ({ theme, district = D
                     </ConvergingCard>
 
                     {/* Bottom Right: Testimonial & Person Block (Carousel) */}
-                    <div className="bg-black/15 border border-white/20 p-10 rounded-2xl flex flex-col items-center text-center relative overflow-hidden backdrop-blur-md shadow-xl transition-all justify-center flex-1 min-h-[320px]">
+                    <div className={`bg-black/15 border border-white/20 p-10 rounded-2xl flex flex-col items-center text-center relative overflow-hidden${blurMd} shadow-xl transition-all justify-center flex-1 min-h-[320px]`}>
                         {/* IG Style Top Progress Bars */}
-                        <div className="absolute top-4 inset-x-4 flex gap-2">
-                            {currentTestimonials.map((_, idx) => (
-                                <div key={idx} className="h-1 flex-1 bg-white/30 rounded-full overflow-hidden">
-                                    <div
-                                        className="h-full bg-white transition-all duration-75"
-                                        style={{
-                                            width: idx === testimonialActiveSlide ? `${testimonialSlideProgress}%` : idx < testimonialActiveSlide ? '100%' : '0%'
-                                        }}
-                                    />
-                                </div>
-                            ))}
-                        </div>
+                        <StoryProgressBars
+                            count={testimonialsCount}
+                            active={testimonialActiveSlide}
+                            cycleKey={`${district}-${testimonialActiveSlide}`}
+                            onComplete={nextTestimonial}
+                        />
 
                         <div className="w-24 h-24 rounded-full border border-white/20 mb-8 flex items-center justify-center relative group overflow-hidden mt-4">
                             <img

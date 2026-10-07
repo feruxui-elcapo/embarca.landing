@@ -158,10 +158,14 @@ export const DistrictModel: React.FC<DistrictModelProps> = ({ district, color, c
     }));
   };
 
+  // Permite reanudar el loop de render cuando se vuelve a la zona visible (ver render)
+  const resumeRef = useRef<() => void>(() => {});
+
   useEffect(() => {
     if (isMobile) return;
     const handleScroll = () => {
       scrollRef.current = window.scrollY;
+      resumeRef.current();
     };
 
     const handleMouseMove = (e: MouseEvent) => {
@@ -213,20 +217,33 @@ export const DistrictModel: React.FC<DistrictModelProps> = ({ district, color, c
     resize();
     window.addEventListener('resize', resize);
 
+    const transitionThreshold = 200;
+    // Pasado el umbral de scroll el modelo es 100% transparente: se limpia una vez y se pausa
+    let paused = false;
+    resumeRef.current = () => {
+      if (paused && scrollRef.current < transitionThreshold) {
+        paused = false;
+        animationRef.current = requestAnimationFrame(render);
+      }
+    };
+
     const render = () => {
       const width = window.innerWidth;
       const height = window.innerHeight;
 
       ctx.clearRect(0, 0, width, height);
 
+      const progress = Math.min(1, Math.max(0, scrollRef.current / transitionThreshold));
+      if (progress >= 1) {
+        paused = true;
+        return;
+      }
+
       rotationY += 0.015;
       rotationX += 0.005;
 
       const mx = mouseRef.current.x;
       const my = mouseRef.current.y;
-
-      const transitionThreshold = 200;
-      const progress = Math.min(1, Math.max(0, scrollRef.current / transitionThreshold));
 
 
       let cx = width / 2;
@@ -280,6 +297,12 @@ export const DistrictModel: React.FC<DistrictModelProps> = ({ district, color, c
       const pixelSize = Math.max(2, scale * 1.2);
       ctx.fillStyle = color;
 
+      // Misma rotación para todos los voxels del cuadro: se calcula una sola vez
+      const cosY = Math.cos(rotationY);
+      const sinY = Math.sin(rotationY);
+      const cosX = Math.cos(rotationX);
+      const sinX = Math.sin(rotationX);
+
       for (let i = 0; i < len; i++) {
         const v = voxels[i];
 
@@ -292,11 +315,6 @@ export const DistrictModel: React.FC<DistrictModelProps> = ({ district, color, c
           ty += v.vy * scatterIntensity;
           tz += v.vz * scatterIntensity;
         }
-
-        const cosY = Math.cos(rotationY);
-        const sinY = Math.sin(rotationY);
-        const cosX = Math.cos(rotationX);
-        const sinX = Math.sin(rotationX);
 
         let x1 = tx * cosY - tz * sinY;
         let z1 = tx * sinY + tz * cosY;
@@ -351,6 +369,7 @@ export const DistrictModel: React.FC<DistrictModelProps> = ({ district, color, c
     render();
 
     return () => {
+      resumeRef.current = () => {};
       window.removeEventListener('resize', resize);
       cancelAnimationFrame(animationRef.current);
     };

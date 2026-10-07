@@ -108,6 +108,12 @@ const SilkPlane = forwardRef(function SilkPlane({ uniforms }, ref) {
 });
 SilkPlane.displayName = 'SilkPlane';
 
+// three.js revisa errores de cada shader esperando sincrónicamente a que la GPU termine de
+// compilarlo (bloquea el hilo principal). Es solo diagnóstico: apagarlo no cambia el render.
+export const disableShaderErrorChecks = ({ gl }) => {
+  gl.debug.checkShaderErrors = false;
+};
+
 const Silk = ({ speed = 5, scale = 1, color = '#7B7481', bgColor = '#ffffff', noiseIntensity = 1.5, rotation = 0 }) => {
   const meshRef = useRef();
 
@@ -124,8 +130,10 @@ const Silk = ({ speed = 5, scale = 1, color = '#7B7481', bgColor = '#ffffff', no
     [speed, scale, noiseIntensity, color, bgColor, rotation]
   );
 
+  // dpr 1: el patrón es un degradado muy suave (el detalle más fino mide cientos de px),
+  // así que en pantallas retina se ve igual y la GPU procesa 4 veces menos píxeles.
   return (
-    <Canvas dpr={[1, 2]} frameloop="always">
+    <Canvas dpr={1} frameloop="always" onCreated={disableShaderErrorChecks}>
       <SilkPlane key={color} ref={meshRef} uniforms={uniforms} />
     </Canvas>
   );

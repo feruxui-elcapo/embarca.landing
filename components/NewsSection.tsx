@@ -7,6 +7,7 @@ import { ConvergingCard } from './ConvergingCard';
 import { NewsItem, getFallbackNews, subscribeToNews } from './newsData';
 import { ShareNewsButton } from './ShareNewsButton';
 import { getNewsIdFromLocation, clearNewsIdFromLocation } from './shareLinks';
+import { useSectionScrollProgress } from './useSectionScrollProgress';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface NewsSectionProps {
@@ -67,7 +68,7 @@ const extractEmbedSrc = (value: string): string => {
 
 export const NewsSection: React.FC<NewsSectionProps> = ({ theme, currentDistrict, onNavigate }) => {
   const sectionRef = useRef<HTMLElement>(null);
-  const [scrollProgress, setScrollProgress] = useState(0);
+  const scrollProgress = useSectionScrollProgress(sectionRef);
   const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
   const [selectedNewsId, setSelectedNewsId] = useState<string | null>(null);
@@ -76,30 +77,6 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ theme, currentDistrict
   
   const [spotifySrc, setSpotifySrc] = useState('https://open.spotify.com/embed/track/0mBKv9DkYfQHjdMcw2jdyI?utm_source=generator');
   const [youtubeSrc, setYoutubeSrc] = useState('https://www.youtube.com/embed/1yb-tnuaEoI');
-
-  useEffect(() => {
-    let isVisible = false;
-    const observer = new IntersectionObserver((entries) => {
-      isVisible = entries[0].isIntersecting;
-    }, { threshold: 0 });
-
-    if (sectionRef.current) observer.observe(sectionRef.current);
-
-    const handleScroll = () => {
-      if (!sectionRef.current || !isVisible) return;
-      const rect = sectionRef.current.getBoundingClientRect();
-      const windowHeight = window.innerHeight;
-      const progress = Math.min(1, Math.max(0, (windowHeight * 0.8 - rect.top) / (rect.height * 0.6)));
-      setScrollProgress(progress);
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      observer.disconnect();
-    };
-  }, []);
 
   useEffect(() => {
     let unsubSpotify: any = null;
@@ -286,7 +263,7 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ theme, currentDistrict
   }, [newsItems, selectedNewsId]);
 
   return (
-    <section ref={sectionRef} className="w-full px-[40px] py-32 relative overflow-hidden bg-white/75 backdrop-blur-md" id="news">
+    <section ref={sectionRef} className="w-full px-[40px] py-32 relative overflow-hidden bg-white/75" id="news">
       <DecorativePattern color={theme.colors[0]} />
 
       <div className="flex items-end justify-between gap-8 mb-16 relative z-10">

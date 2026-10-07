@@ -2,6 +2,8 @@ import React, { useRef, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { DistrictTheme, District } from '../types';
 import { ConvergingCard } from './ConvergingCard';
+import { useSectionScrollProgress } from './useSectionScrollProgress';
+import { getThumbSrc, preloadImage } from './imageThumbs';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface ProtagonistasProps {
@@ -66,7 +68,7 @@ const DISTRICT_PROTAGONISTS: Record<District, Protagonist[]> = {
         role: 'Partner',
         company: 'Embarca',
         focus: 'Venture',
-        image: '/fotos-de-protagonistas/nuevas-fotos/valen_v2.png',
+        image: '/fotos-de-protagonistas/nuevas-fotos/valen_v2.webp',
         stats: ['Escala', 'Manija', 'Aventurera'],
         story: [
             { title: 'Estudios', text: 'Lic. en Administración de Empresas' },
@@ -79,7 +81,7 @@ const DISTRICT_PROTAGONISTS: Record<District, Protagonist[]> = {
         role: 'Partner',
         company: 'Embarca',
         focus: 'Embarca',
-        image: '/fotos-de-protagonistas/nuevas-fotos/gonza_v2.png',
+        image: '/fotos-de-protagonistas/nuevas-fotos/gonza_v2.webp',
         stats: ['Intergaláctico', 'Reflexivo', 'Disruptivo'],
         story: [
             { title: 'Estudios', text: 'Ingeniero Industrial, MBA y Máster en Mercados Financieros' },
@@ -194,7 +196,7 @@ const DISTRICT_PROTAGONISTS: Record<District, Protagonist[]> = {
         role: 'Connect',
         company: 'Embarca',
         focus: 'Connect',
-        image: '/fotos-de-protagonistas/nuevas-fotos/ampi.png',
+        image: '/fotos-de-protagonistas/nuevas-fotos/ampi.webp',
         stats: ['Empática', 'Comprometida', 'Versátil'],
         story: [
             { title: 'Estudios', text: 'Contadora Pública Nacional' },
@@ -348,7 +350,7 @@ const DISTRICT_PROTAGONISTS: Record<District, Protagonist[]> = {
 export const ProtagonistasSection: React.FC<ProtagonistasProps> = ({ theme, district = District.NATION }) => {
     const sectionRef = useRef<HTMLElement>(null);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
-    const [scrollProgress, setScrollProgress] = useState(0);
+    const scrollProgress = useSectionScrollProgress(sectionRef);
     const [activeIndex, setActiveIndex] = useState<number | null>(null);
     const activeProtagonist = activeIndex !== null ? (DISTRICT_PROTAGONISTS[district] || DISTRICT_PROTAGONISTS[District.NATION])[activeIndex] : null;
 
@@ -402,30 +404,13 @@ export const ProtagonistasSection: React.FC<ProtagonistasProps> = ({ theme, dist
         });
     };
 
+    // Con el modal abierto, precarga las fotos vecinas para que las flechas sean instantáneas
     useEffect(() => {
-        let isVisible = false;
-        const observer = new IntersectionObserver((entries) => {
-            isVisible = entries[0].isIntersecting;
-        }, { threshold: 0 });
-
-        if (sectionRef.current) observer.observe(sectionRef.current);
-
-        const handleScrollEvent = () => {
-            if (!sectionRef.current || !isVisible) return;
-            const rect = sectionRef.current.getBoundingClientRect();
-            const windowHeight = window.innerHeight;
-            // Faster convergence
-            const progress = Math.min(1, Math.max(0, (windowHeight * 0.8 - rect.top) / (rect.height * 0.6)));
-            setScrollProgress(progress);
-        };
-
-        window.addEventListener('scroll', handleScrollEvent, { passive: true });
-        handleScrollEvent();
-        return () => {
-            window.removeEventListener('scroll', handleScrollEvent);
-            observer.disconnect();
-        };
-    }, []);
+        if (activeIndex === null) return;
+        const len = currentItems.length;
+        preloadImage(currentItems[(activeIndex + 1) % len]?.image);
+        preloadImage(currentItems[(activeIndex - 1 + len) % len]?.image);
+    }, [activeIndex, currentItems]);
 
     useEffect(() => {
         if (activeIndex === null) return;
@@ -476,7 +461,7 @@ export const ProtagonistasSection: React.FC<ProtagonistasProps> = ({ theme, dist
     };
 
     return (
-        <section ref={sectionRef} className="w-full px-[60px] md:px-[100px] py-16 relative z-20 overflow-hidden bg-white/75 backdrop-blur-md">
+        <section ref={sectionRef} className="w-full px-[60px] md:px-[100px] py-16 relative z-20 overflow-hidden bg-white/75">
             
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 mb-16 w-full">
                 <h2 className="font-sans text-4xl md:text-5xl font-bold text-zinc-800 uppercase italic tracking-tighter" style={{ transform: 'none', perspective: 'none' }}>
@@ -524,6 +509,8 @@ export const ProtagonistasSection: React.FC<ProtagonistasProps> = ({ theme, dist
                                 type="button"
                                 className="flex flex-col gap-3 group text-left w-full"
                                 onClick={() => setActiveIndex(idx)}
+                                onPointerEnter={() => preloadImage(item.image)}
+                                onFocus={() => preloadImage(item.image)}
                             >
                                 {/* Image */}
                                 <div
@@ -532,7 +519,7 @@ export const ProtagonistasSection: React.FC<ProtagonistasProps> = ({ theme, dist
                                 >
                                     <div className="absolute inset-x-0 bottom-0 h-1 opacity-0 group-hover:opacity-100 transition-opacity" style={{ backgroundColor: theme.colors[0] }} />
                                     <img
-                                        src={item.image}
+                                        src={getThumbSrc(item.image)}
                                         alt={item.name}
                                         className={`w-full h-full ${isNation ? 'object-cover' : 'object-contain p-4'} group-hover:scale-105 transition-transform duration-500`}
                                     />

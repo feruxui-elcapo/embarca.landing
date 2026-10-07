@@ -25,7 +25,9 @@ export const PurposeSection: React.FC<PurposeSectionProps> = ({ theme, currentDi
   const [scrollProgress, setScrollProgress] = useState(0);
 
   useEffect(() => {
-    const handleScroll = () => {
+    let frame = 0;
+    const update = () => {
+      frame = 0;
       if (!containerRef.current) return;
       const rect = containerRef.current.getBoundingClientRect();
       const windowHeight = window.innerHeight;
@@ -50,9 +52,17 @@ export const PurposeSection: React.FC<PurposeSectionProps> = ({ theme, currentDi
       setScrollProgress(progress);
     };
 
+    // Como máximo un cálculo por cuadro, aunque lleguen varios eventos de scroll
+    const handleScroll = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+
     window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll(); // Init
-    return () => window.removeEventListener('scroll', handleScroll);
+    update(); // Init
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      cancelAnimationFrame(frame);
+    };
   }, []);
 
   const text = getPurposeText(currentDistrict);
@@ -61,7 +71,7 @@ export const PurposeSection: React.FC<PurposeSectionProps> = ({ theme, currentDi
   return (
     <section 
       ref={containerRef} 
-      className="w-full min-h-screen flex flex-col items-center justify-center px-6 md:px-12 py-24 relative overflow-hidden bg-black backdrop-blur-md"
+      className="w-full min-h-screen flex flex-col items-center justify-center px-6 md:px-12 py-24 relative overflow-hidden bg-black"
     >
       <div className="absolute inset-0 opacity-5 bg-[radial-gradient(circle_at_center,var(--tw-gradient-stops))] from-white via-transparent to-transparent pointer-events-none" />
       
