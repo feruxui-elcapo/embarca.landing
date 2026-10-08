@@ -56,7 +56,9 @@ export const PixelButton: React.FC<PixelButtonProps> = ({
   };
 
   const roundedClass = variant === 'nav' || variant === 'nav-active' ? 'rounded-full' : 'rounded-lg';
-  const baseClasses = `relative font-pixel uppercase tracking-wider transition-all duration-200 ease-out outline-none overflow-hidden group ${roundedClass}`;
+  // La variante 'nav' usa tracking-wide (es lo que resolvía el CDN de Tailwind cuando convivían ambas clases)
+  const trackingClass = variant === 'nav' ? '' : 'tracking-wider';
+  const baseClasses = `relative font-pixel uppercase ${trackingClass} transition-all duration-200 ease-out outline-none overflow-hidden group ${roundedClass}`;
 
   const getVariantClasses = () => {
     switch (variant) {

@@ -34,44 +34,40 @@ const PALETTES: Record<District, string[]> = {
   [District.COWORK]: ['#ffffff', '#00ccff', '#FFFFFF', '#0088ff'],
 };
 
+// Margen de los buffers offscreen para que el blur y el temblor nunca se recorten distinto
+const GLOW_PAD = 32;
+// Por debajo de este valor el temblor es sub-pixel: se dibuja el cuadro estático cacheado
+const STATIC_PROXIMITY = 0.001;
+
 export const LiquidBackground: React.FC<LiquidBackgroundProps> = ({ district, className, text, align = 'center' }) => {
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const animationRef = useRef<number>(0);
-  const mouseRef = useRef({ x: 0, y: 0 });
+  const pointerRef = useRef({ x: 0, y: 0 });
   const lastMoveRef = useRef<number>(0);
   const activityRef = useRef<number>(0);
 
   useEffect(() => {
+    if (!text) return;
+
+    // Guardamos la posición cruda; se convierte a coordenadas del canvas una vez por cuadro
     const handleMouseMove = (e: MouseEvent) => {
       lastMoveRef.current = performance.now();
-      if (text && containerRef.current) {
-        const rect = containerRef.current.getBoundingClientRect();
-        mouseRef.current = { x: e.clientX - rect.left, y: e.clientY - rect.top };
-      } else {
-        mouseRef.current = { x: e.clientX, y: e.clientY };
-      }
+      pointerRef.current = { x: e.clientX, y: e.clientY };
     };
 
     const handleTouchMove = (e: TouchEvent) => {
       lastMoveRef.current = performance.now();
       const touch = e.touches[0];
-      if (touch) {
-        if (text && containerRef.current) {
-          const rect = containerRef.current.getBoundingClientRect();
-          mouseRef.current = { x: touch.clientX - rect.left, y: touch.clientY - rect.top };
-        } else {
-          mouseRef.current = { x: touch.clientX, y: touch.clientY };
-        }
-      }
+      if (touch) pointerRef.current = { x: touch.clientX, y: touch.clientY };
     };
 
     const handleMouseLeave = () => {
       lastMoveRef.current = 0;
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
     window.addEventListener('touchmove', handleTouchMove, { passive: true });
     window.addEventListener('touchstart', handleTouchMove, { passive: true });
     document.addEventListener('mouseleave', handleMouseLeave);
@@ -88,44 +84,94 @@ export const LiquidBackground: React.FC<LiquidBackgroundProps> = ({ district, cl
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    const container = containerRef.current;
+    if (!text || !canvas || !container) return;
 
-    // Enable alpha for text mode to allow transparency
-    const ctx = canvas.getContext('2d', { alpha: !!text });
+    const ctx = canvas.getContext('2d', { alpha: true });
     if (!ctx) return;
 
-    let time = 0;
+    const palette = PALETTES[district];
+    const txt = text.toUpperCase();
 
-    const resize = () => {
-      // PERFORMANCE OPTIMIZATION: Force DPR to 1.
-      // High-DPI rendering is the #1 cause of lag on low-end devices with large canvases.
-      const dpr = 1;
+    // Layout y buffers cacheados: se recalculan solo cuando cambia el tamaño del canvas
+    let layout: { w: number; h: number; fontSize: number; cx: number; cy: number } | null = null;
+    const glowCanvas = document.createElement('canvas');
+    const staticCanvas = document.createElement('canvas');
 
-      if (text && containerRef.current) {
-        const rect = containerRef.current.getBoundingClientRect();
-        canvas.width = rect.width * dpr;
-        canvas.height = rect.height * dpr;
-        ctx.scale(dpr, dpr);
-        canvas.style.width = `${rect.width}px`;
-        canvas.style.height = `${rect.height}px`;
-      } else {
-        canvas.width = window.innerWidth * dpr;
-        canvas.height = window.innerHeight * dpr;
-        ctx.scale(dpr, dpr);
-        canvas.style.width = '100vw';
-        canvas.style.height = '100vh';
-      }
+    const setTextStyle = (c: CanvasRenderingContext2D, fontSize: number) => {
+      c.font = `${fontSize}px "VT323", monospace`;
+      c.textBaseline = 'middle';
+      c.textAlign = align;
     };
 
-    window.addEventListener('resize', resize);
-    setTimeout(resize, 0);
+    const buildLayout = (w: number, h: number) => {
+      let fontSize = 300;
+      ctx.font = `${fontSize}px "VT323", monospace`;
+      const textWidth = ctx.measureText(txt).width;
+      const maxTextWidth = w * 0.9;
+      if (textWidth > maxTextWidth) {
+        fontSize = fontSize * (maxTextWidth / textWidth);
+      }
+      const maxTextHeight = h * 0.85;
+      if (fontSize > maxTextHeight) {
+        fontSize = maxTextHeight;
+      }
+      const cx = align === 'left' ? fontSize * 0.1 : align === 'right' ? w - fontSize * 0.1 : w / 2;
+      const cy = h / 2;
+
+      // Resplandor de color desenfocado (antes se calculaba con ctx.filter en cada cuadro)
+      glowCanvas.width = w + GLOW_PAD * 2;
+      glowCanvas.height = h + GLOW_PAD * 2;
+      const g = glowCanvas.getContext('2d');
+      if (g) {
+        setTextStyle(g, fontSize);
+        g.filter = 'blur(4px)';
+        g.fillStyle = palette[1];
+        g.fillText(txt, cx + GLOW_PAD, cy + GLOW_PAD);
+      }
+
+      // Cuadro completo sin temblor (glow + offset + texto principal), igual al dibujo en reposo
+      staticCanvas.width = w + GLOW_PAD * 2;
+      staticCanvas.height = h + GLOW_PAD * 2;
+      const s = staticCanvas.getContext('2d');
+      if (s) {
+        s.globalAlpha = 0.5;
+        s.drawImage(glowCanvas, 0, 0);
+        setTextStyle(s, fontSize);
+        s.globalAlpha = 0.4;
+        s.fillStyle = palette[2] || palette[1];
+        s.fillText(txt, cx + GLOW_PAD, cy + GLOW_PAD);
+        s.globalAlpha = 1;
+        s.fillStyle = '#ffffff';
+        s.fillText(txt, cx + GLOW_PAD, cy + GLOW_PAD);
+      }
+
+      layout = { w, h, fontSize, cx, cy };
+    };
+
+    // Tamaño cacheado (ResizeObserver): leer clientWidth en cada cuadro forzaba recálculo de layout
+    let logicalWidth = 0;
+    let logicalHeight = 0;
+    // En reposo el cuadro estático no cambia: solo se repinta si hubo temblor o glitch antes
+    let staticOnCanvas = false;
+
+    const resize = () => {
+      const rect = container.getBoundingClientRect();
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+      canvas.style.width = `${rect.width}px`;
+      canvas.style.height = `${rect.height}px`;
+      logicalWidth = container.clientWidth;
+      logicalHeight = container.clientHeight;
+      layout = null;
+      staticOnCanvas = false;
+    };
 
     const draw = () => {
-      const logicalWidth = text && containerRef.current ? containerRef.current.clientWidth : window.innerWidth;
-      const logicalHeight = text && containerRef.current ? containerRef.current.clientHeight : window.innerHeight;
-
-      const palette = PALETTES[district];
-      const isMobile = logicalWidth < 768;
+      if (!layout || layout.w !== logicalWidth || layout.h !== logicalHeight) {
+        buildLayout(logicalWidth, logicalHeight);
+      }
+      const { fontSize, cx, cy } = layout!;
 
       const now = performance.now();
       const timeSinceMove = now - lastMoveRef.current;
@@ -135,72 +181,49 @@ export const LiquidBackground: React.FC<LiquidBackgroundProps> = ({ district, cl
       activityRef.current += (targetActivity - activityRef.current) * 0.05;
       const activityStrength = activityRef.current;
 
-      // 1. Clear / Background Fill
-      if (!text) {
-        // Optimization: Fill with solid color occasionally or simple gradient
-        const bgGradient = ctx.createLinearGradient(0, 0, 0, logicalHeight);
-        bgGradient.addColorStop(0, palette[0]);
-        bgGradient.addColorStop(1, '#fafafa');
-        ctx.fillStyle = bgGradient;
-        ctx.fillRect(0, 0, logicalWidth, logicalHeight);
-      } else {
-        ctx.clearRect(0, 0, logicalWidth, logicalHeight);
+      let proximity = 0;
+      if (activityStrength > 1e-4) {
+        const rect = container.getBoundingClientRect();
+        const dx = pointerRef.current.x - rect.left - cx;
+        const dy = pointerRef.current.y - rect.top - cy;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        proximity = Math.max(0, 1 - dist / 400) * activityStrength;
       }
 
-      time += 0.01;
+      // Reduced Glitch Frequency
+      const glitch = Math.random() < (0.01 + proximity * 0.05);
+      const isStatic = proximity < STATIC_PROXIMITY;
 
-      ctx.save();
+      if (isStatic && !glitch && staticOnCanvas) {
+        // El canvas ya muestra exactamente este cuadro
+        animationRef.current = requestAnimationFrame(draw);
+        return;
+      }
 
-      if (text) {
-        // --- TEXT MODE ---
-        const txt = text.toUpperCase();
+      ctx.clearRect(0, 0, logicalWidth, logicalHeight);
 
-        let fontSize = 300;
-        ctx.font = `${fontSize}px "VT323", monospace`;
-        const metrics = ctx.measureText(txt);
-        const textWidth = metrics.width;
-        const maxTextWidth = logicalWidth * 0.9;
-        if (textWidth > maxTextWidth) {
-          fontSize = fontSize * (maxTextWidth / textWidth);
-        }
-        const maxTextHeight = logicalHeight * 0.85;
-        if (fontSize > maxTextHeight) {
-          fontSize = maxTextHeight;
-        }
-        ctx.font = `${fontSize}px "VT323", monospace`;
-        ctx.textBaseline = 'middle';
+      let shakeX = 0;
+      let shakeY = 0;
 
-        const cx = align === 'left' ? fontSize * 0.1 : align === 'right' ? logicalWidth - fontSize * 0.1 : logicalWidth / 2;
-        const cy = logicalHeight / 2;
-
-        ctx.textAlign = align;
-
-
-
-        const dx = mouseRef.current.x - cx;
-        const dy = mouseRef.current.y - cy;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        const proximity = Math.max(0, 1 - dist / 400) * activityStrength;
-
-        const shakeX = (Math.random() - 0.5) * 10 * proximity;
-        const shakeY = (Math.random() - 0.5) * 10 * proximity;
+      if (isStatic) {
+        ctx.drawImage(staticCanvas, -GLOW_PAD, -GLOW_PAD);
+      } else {
+        shakeX = (Math.random() - 0.5) * 10 * proximity;
+        shakeY = (Math.random() - 0.5) * 10 * proximity;
 
         // Glowing colored shadow (the effect)
-        ctx.save();
         ctx.globalAlpha = 0.5;
-        ctx.filter = 'blur(4px)';
-        ctx.fillStyle = palette[1];
-        ctx.fillText(txt, cx + shakeX, cy + shakeY);
-        ctx.restore();
+        ctx.drawImage(glowCanvas, shakeX - GLOW_PAD, shakeY - GLOW_PAD);
+
+        setTextStyle(ctx, fontSize);
 
         // Extra sharp colored offset
-        ctx.save();
         ctx.globalAlpha = 0.4;
         ctx.fillStyle = palette[2] || palette[1];
         ctx.fillText(txt, cx + shakeX + 6 * proximity, cy + shakeY + 6 * proximity);
-        ctx.restore();
 
         // Main Text (Solid White)
+        ctx.globalAlpha = 1;
         ctx.fillStyle = '#ffffff';
         ctx.fillText(txt, cx + shakeX, cy + shakeY);
 
@@ -216,91 +239,73 @@ export const LiquidBackground: React.FC<LiquidBackgroundProps> = ({ district, cl
           ctx.fillText(txt, cx + shakeX + (4 * proximity), cy + shakeY);
           ctx.restore();
         }
+      }
 
-        // Reduced Glitch Frequency
-        if (Math.random() < (0.01 + proximity * 0.05)) {
-          const slices = 1 + Math.floor(proximity * 3);
-          for (let i = 0; i < slices; i++) {
-            const sliceHeight = fontSize * (0.1 + Math.random() * 0.1);
-            const sliceY = (cy - fontSize / 2) + Math.random() * fontSize;
-            const shift = (Math.random() - 0.5) * 20;
+      staticOnCanvas = isStatic && !glitch;
 
-            ctx.save();
-            ctx.beginPath();
-            ctx.rect(0, sliceY, logicalWidth, sliceHeight);
-            ctx.clip();
-            ctx.fillStyle = (i % 2 === 0) ? palette[1] : '#ffffff';
-            ctx.fillText(txt, cx + shakeX + shift, cy + shakeY);
-            ctx.restore();
-          }
-        }
+      if (glitch) {
+        setTextStyle(ctx, fontSize);
+        ctx.globalAlpha = 1;
+        const slices = 1 + Math.floor(proximity * 3);
+        for (let i = 0; i < slices; i++) {
+          const sliceHeight = fontSize * (0.1 + Math.random() * 0.1);
+          const sliceY = (cy - fontSize / 2) + Math.random() * fontSize;
+          const shift = (Math.random() - 0.5) * 20;
 
-        // Simplified Scanlines (Less frequent draw) - Removidas a pedido del usuario
-
-      } else {
-        // --- BACKGROUND MODE ---
-        // Optimization: Reduced translation complexity
-        ctx.translate(logicalWidth / 2, logicalHeight / 2);
-        ctx.rotate(-Math.PI / 6);
-
-        const diagonal = Math.sqrt(logicalWidth * logicalWidth + logicalHeight * logicalHeight);
-        const drawSize = diagonal * 2;
-        ctx.translate(-drawSize / 2, -drawSize / 2);
-
-        // PERFORMANCE: Reduce line count significantly
-        const lines = isMobile ? 15 : 25;
-        // Use multiply for liquid lines on light background
-        ctx.globalCompositeOperation = 'multiply';
-
-        // PERFORMANCE: Increase step size to reduce path segments
-        const step = isMobile ? 60 : 40;
-
-        for (let i = 0; i < lines; i++) {
+          ctx.save();
           ctx.beginPath();
-          const iNorm = i / lines;
-
-          let strokeColor = palette[1];
-          if (i % 2 === 0) strokeColor = palette[2];
-          if (i % 5 === 0 && palette[3]) strokeColor = palette[3];
-
-          ctx.strokeStyle = strokeColor;
-          ctx.globalAlpha = 0.15;
-          ctx.lineWidth = 2;
-
-          const yBase = i * (drawSize / lines);
-
-          for (let x = 0; x <= drawSize; x += step) {
-            const xNorm = x / drawSize;
-            const largeSwell = Math.sin(xNorm * 3 + time * 0.3 + iNorm * 2) * 150;
-            // Removed extra complexity layers for speed
-            const ripples = Math.cos(xNorm * 8 - time * 0.5) * 30;
-            const y = yBase + largeSwell + ripples;
-
-            if (x === 0) ctx.moveTo(x, y);
-            else ctx.lineTo(x, y);
-          }
-          ctx.stroke();
+          ctx.rect(0, sliceY, logicalWidth, sliceHeight);
+          ctx.clip();
+          ctx.fillStyle = (i % 2 === 0) ? palette[1] : '#ffffff';
+          ctx.fillText(txt, cx + shakeX + shift, cy + shakeY);
+          ctx.restore();
         }
       }
 
-      ctx.restore();
+      ctx.globalAlpha = 1;
       animationRef.current = requestAnimationFrame(draw);
     };
 
-    if (text) {
-      document.fonts.ready.then(() => {
-        resize();
-        draw();
-      });
-    } else {
-      draw();
-    }
-
-    return () => {
-      window.removeEventListener('resize', resize);
+    // Solo anima mientras el título está en pantalla (header oculto o hero scrolleado = pausa)
+    let fontsReady = false;
+    let isVisible = false;
+    let running = false;
+    const start = () => {
+      if (running || !fontsReady || !isVisible) return;
+      running = true;
+      animationRef.current = requestAnimationFrame(draw);
+    };
+    const stop = () => {
+      running = false;
       cancelAnimationFrame(animationRef.current);
     };
-  }, [district, text]);
+
+    const observer = new IntersectionObserver((entries) => {
+      isVisible = entries[entries.length - 1].isIntersecting;
+      if (isVisible) start(); else stop();
+    });
+    observer.observe(container);
+
+    const resizeObserver = new ResizeObserver(() => {
+      if (fontsReady) resize();
+    });
+    resizeObserver.observe(container);
+
+    let cancelled = false;
+    document.fonts.ready.then(() => {
+      if (cancelled) return;
+      fontsReady = true;
+      resize();
+      start();
+    });
+
+    return () => {
+      cancelled = true;
+      observer.disconnect();
+      resizeObserver.disconnect();
+      stop();
+    };
+  }, [district, text, align]);
 
   if (text) {
     return (

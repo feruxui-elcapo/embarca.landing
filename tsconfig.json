@@ -30,13 +30,6 @@
   "exclude": [
     "node_modules",
     "dist",
-    "apply.js",
-    "fix-people.cjs",
-    "fix-phrases.cjs",
-    "fix-protagonistas.cjs",
-    "fix-protagonistas2.js",
-    "fix_admin.js",
-    "fix_protag.js",
     "scratch"
   ]
 }

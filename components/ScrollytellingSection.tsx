@@ -3,6 +3,7 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Environment, SoftShadows, MeshDistortMaterial, Float, Sparkles } from '@react-three/drei';
 import { motion, useScroll, useMotionValueEvent, AnimatePresence, useSpring, useInView } from 'framer-motion';
 import * as THREE from 'three';
+import { disableShaderErrorChecks } from './Silk';
 
 // --- DATA ---
 const PHRASES = [
@@ -77,7 +78,15 @@ class SpiralCurve extends THREE.Curve<THREE.Vector3> {
 const spiralPath = new SpiralCurve(1);
 
 // --- 3D COMPONENTS ---
-function Shape({ type, progress, isMobile }: { type: string, progress: number, isMobile: boolean }) {
+// El progreso llega por ref y se lee en useFrame: así la escena 3D no se re-renderiza
+// en React en cada cuadro de la transición entre etapas.
+type ProgressRef = React.MutableRefObject<number>;
+
+const SCROLLY_CAMERA = { position: [0, 0, 9] as [number, number, number], fov: 40 };
+const SCROLLY_DPR_DESKTOP: [number, number] = [1, 2];
+const TARGET_SCALE = new THREE.Vector3();
+
+function Shape({ type, progressRef, isMobile, showSparkles }: { type: string, progressRef: ProgressRef, isMobile: boolean, showSparkles?: boolean }) {
   const meshRef = useRef<THREE.Group>(null!);
   const materialRef = useRef<any>(null!);
   const floatRef = useRef<any>(null!);
@@ -85,9 +94,12 @@ function Shape({ type, progress, isMobile }: { type: string, progress: number, i
 
   const isMobileSize = isMobile || size.width < 768;
 
-  useFrame((state, delta) => {
+  useFrame((state, rawDelta) => {
     if (!meshRef.current) return;
-    
+    const progress = progressRef.current;
+    // Al reanudar el render tras estar fuera de pantalla el primer delta puede ser enorme
+    const delta = Math.min(rawDelta, 0.1);
+
     meshRef.current.rotation.y += delta * 0.1;
     meshRef.current.rotation.x += delta * 0.05;
 
@@ -143,7 +155,7 @@ function Shape({ type, progress, isMobile }: { type: string, progress: number, i
     const baseScale = isMobileSize ? 0.85 : 1.0;
     targetScale *= baseScale;
 
-    meshRef.current.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), delta * 4);
+    meshRef.current.scale.lerp(TARGET_SCALE.set(targetScale, targetScale, targetScale), delta * 4);
     
     if (materialRef.current && materialRef.current.opacity !== undefined) {
       materialRef.current.opacity = THREE.MathUtils.lerp(materialRef.current.opacity, targetOpacity, delta * 6);
@@ -200,8 +212,8 @@ function Shape({ type, progress, isMobile }: { type: string, progress: number, i
               <icosahedronGeometry args={[1, 1]} />
               <meshBasicMaterial color="#c0d8ff" wireframe transparent opacity={0.12} />
           </mesh>
-          {progress > 0.60 && (
-            <Sparkles 
+          {showSparkles && (
+            <Sparkles
               count={isMobileSize ? 8 : 50} 
               scale={isMobileSize ? 1.5 : 2} 
               size={isMobileSize ? 1.5 : 3} 
@@ -216,7 +228,7 @@ function Shape({ type, progress, isMobile }: { type: string, progress: number, i
   );
 }
 
-function Scene({ progress, isMobile }: { progress: number, isMobile: boolean }) {
+const Scene = React.memo(function Scene({ progressRef, isMobile, showSparkles }: { progressRef: ProgressRef, isMobile: boolean, showSparkles: boolean }) {
   return (
     <>
       <Environment preset="city" />
@@ -230,8 +242,8 @@ function Scene({ progress, isMobile }: { progress: number, isMobile: boolean }) 
       />
       <directionalLight position={[-10, 0, -10]} intensity={1} color="#ffffff" />
 
-      <Shape type="rock" progress={progress} isMobile={isMobile} />
-      <Shape type="diamond" progress={progress} isMobile={isMobile} />
+      <Shape type="rock" progressRef={progressRef} isMobile={isMobile} />
+      <Shape type="diamond" progressRef={progressRef} isMobile={isMobile} showSparkles={showSparkles} />
 
       {!isMobile && <SoftShadows size={20} samples={10} focus={0.5} />}
       {!isMobile && (
@@ -242,7 +254,7 @@ function Scene({ progress, isMobile }: { progress: number, isMobile: boolean }) 
       )}
     </>
   );
-}
+});
 
 const LOGOS_DATA = [
   { key: 'nation', src: '/distritos/Nation.svg', startX: 500, startY: -400 },
@@ -309,6 +321,10 @@ export const ScrollytellingSection = () => {
   });
 
   const [progress, setProgress] = useState(0);
+  const progressRef = useRef(0);
+  // El canvas 3D se crea la primera vez que la sección se acerca y después queda montado
+  // (solo se pausa el render): recrearlo en cada entrada recompilaba shaders y el entorno.
+  const [hasEnteredView, setHasEnteredView] = useState(false);
   const [snappedProgress, setSnappedProgress] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
   const smoothProgress = useSpring(0, { stiffness: 50, damping: 20 });
@@ -335,8 +351,13 @@ export const ScrollytellingSection = () => {
   }, [snappedProgress, smoothProgress]);
 
   useMotionValueEvent(smoothProgress, "change", (latest) => {
+    progressRef.current = latest;
     setProgress(latest);
   });
+
+  useEffect(() => {
+    if (isInView) setHasEnteredView(true);
+  }, [isInView]);
 
   // Calculate currentPhase for UI elements based on the exact snapped state
   const currentPhase = snappedProgress === 1 ? 2 : snappedProgress === 0.5 ? 1 : 0;
@@ -395,9 +416,14 @@ export const ScrollytellingSection = () => {
 
         {/* 3D Canvas Center */}
         <div className="absolute inset-0 z-20 pointer-events-none">
-          {isInView && (
-            <Canvas camera={{ position: [0, 0, 9], fov: 40 }} dpr={isMobile ? 1 : [1, 2]}>
-              <Scene progress={progress} isMobile={isMobile} />
+          {(isInView || hasEnteredView) && (
+            <Canvas
+              camera={SCROLLY_CAMERA}
+              dpr={isMobile ? 1 : SCROLLY_DPR_DESKTOP}
+              frameloop={isInView ? 'always' : 'never'}
+              onCreated={disableShaderErrorChecks}
+            >
+              <Scene progressRef={progressRef} isMobile={isMobile} showSparkles={progress > 0.60} />
             </Canvas>
           )}
         </div>

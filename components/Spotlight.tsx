@@ -15,13 +15,23 @@ export const Spotlight: React.FC<SpotlightProps> = ({ color }) => {
     targetRef.current = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
     posRef.current = { ...targetRef.current };
 
+    // El loop solo corre mientras el halo se está acercando al cursor; quieto no consume nada
+    let running = false;
+    const wake = () => {
+      if (running) return;
+      running = true;
+      requestRef.current = requestAnimationFrame(animate);
+    };
+
     const handleMouseMove = (e: MouseEvent) => {
       targetRef.current = { x: e.clientX, y: e.clientY };
+      wake();
     };
 
     const handleTouchMove = (e: TouchEvent) => {
       if (e.touches[0]) {
         targetRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        wake();
       }
     };
 
@@ -40,12 +50,19 @@ export const Spotlight: React.FC<SpotlightProps> = ({ color }) => {
         
         divRef.current.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%)`;
       }
+      const settled =
+        Math.abs(targetRef.current.x - posRef.current.x) < 0.05 &&
+        Math.abs(targetRef.current.y - posRef.current.y) < 0.05;
+      if (settled) {
+        running = false;
+        return;
+      }
       requestRef.current = requestAnimationFrame(animate);
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
     window.addEventListener('touchmove', handleTouchMove, { passive: true });
-    requestRef.current = requestAnimationFrame(animate);
+    wake();
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);

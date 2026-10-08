@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { LiquidBackground } from './components/LiquidBackground';
 import { Navigation } from './components/Navigation';
 import { ShockwaveIntro, ShockwaveIntroRef } from './components/ShockwaveIntro';
-import { ParticleField } from './components/ParticleField';
 import { Spotlight } from './components/Spotlight';
 import { District, DistrictTheme } from './types';
 import { PixelButton } from './components/PixelButton';
@@ -12,9 +11,13 @@ import { ProtagonistasSection } from './components/ProtagonistasSection';
 import { NewsSection } from './components/NewsSection';
 import { NewToolkitSection } from './components/NewToolkitSection';
 import { PurposeSection } from './components/PurposeSection';
-import { AdminPanel } from './components/AdminPanel';
 import { Footer } from './components/Footer';
 import { Header } from './components/Header';
+
+// El panel de admin solo se descarga cuando se entra a /admin o ?admin=1
+const AdminPanel = React.lazy(() =>
+  import('./components/AdminPanel').then(module => ({ default: module.AdminPanel }))
+);
 
 // Lazy load DistrictModel (Visual heavy 3D component)
 const DistrictModel = React.lazy(() =>
@@ -79,7 +82,10 @@ const App: React.FC = () => {
   const footerRef = useRef<HTMLDivElement>(null);
   const lastScrollYRef = useRef(0);
   const [scrolled, setScrolled] = useState(false);
-  const [scrollProgress, setScrollProgress] = useState(0);
+  // El fundido del título del hero se aplica directo al DOM: con estado, cada evento de scroll
+  // re-renderizaba toda la página durante los primeros 200px.
+  const scrollProgressRef = useRef(0);
+  const heroTitleRef = useRef<HTMLDivElement>(null);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
 
   useEffect(() => {
@@ -88,7 +94,11 @@ const App: React.FC = () => {
       const scrollY = window.scrollY;
       const threshold = 200;
       setScrolled(scrollY > threshold);
-      setScrollProgress(Math.min(1, Math.max(0, scrollY / threshold)));
+      const progress = Math.min(1, Math.max(0, scrollY / threshold));
+      if (progress !== scrollProgressRef.current) {
+        scrollProgressRef.current = progress;
+        if (heroTitleRef.current) heroTitleRef.current.style.opacity = String(1 - progress);
+      }
     };
 
 
@@ -204,26 +214,45 @@ const App: React.FC = () => {
     const isTouch = window.matchMedia('(pointer: coarse)').matches;
     if (isTouch) return;
 
-    const handleMouseMove = (e: MouseEvent) => {
-      if (cursorRef.current) {
-        cursorRef.current.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`;
+    // Se actualiza una vez por cuadro, y el cursor computado solo se lee cuando cambia el
+    // elemento bajo el mouse (getComputedStyle en cada mousemove forzaba recálculo de estilos).
+    let frame = 0;
+    let lastEvent: MouseEvent | null = null;
+    let lastTarget: EventTarget | null = null;
+    let hidden = false;
 
-        // Hide if navigating over elements with custom cursors or pointers
-        const target = e.target as HTMLElement;
-        const computedCursor = window.getComputedStyle(target).cursor;
-        if (computedCursor.includes('url(') || computedCursor === 'pointer') {
-          cursorRef.current.style.opacity = '0';
-        } else {
-          cursorRef.current.style.opacity = '1';
-        }
+    const update = () => {
+      frame = 0;
+      const e = lastEvent;
+      if (!e || !cursorRef.current) return;
+      cursorRef.current.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`;
+
+      // Hide if navigating over elements with custom cursors or pointers
+      if (e.target !== lastTarget) {
+        lastTarget = e.target;
+        const computedCursor = window.getComputedStyle(e.target as HTMLElement).cursor;
+        hidden = computedCursor.includes('url(') || computedCursor === 'pointer';
       }
+      cursorRef.current.style.opacity = hidden ? '0' : '1';
     };
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
+
+    const handleMouseMove = (e: MouseEvent) => {
+      lastEvent = e;
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      cancelAnimationFrame(frame);
+    };
   }, [isAdminMode]);
 
   if (isAdminMode) {
-    return <AdminPanel onExit={handleExitAdmin} />;
+    return (
+      <Suspense fallback={null}>
+        <AdminPanel onExit={handleExitAdmin} />
+      </Suspense>
+    );
   }
 
   return (
@@ -306,8 +335,9 @@ const App: React.FC = () => {
               <div className="w-full min-h-[20vh] md:min-h-screen flex flex-col justify-center pb-6 md:pb-24 pt-10">
                 {/* MAIN TITLE (Glitch Texture) */}
                 <div
+                  ref={heroTitleRef}
                   className="relative z-10 w-full flex justify-center mb-8 md:mb-12 pointer-events-none transition-opacity duration-300 mt-auto"
-                  style={{ opacity: 1 - scrollProgress }}
+                  style={{ opacity: 1 - scrollProgressRef.current }}
                 >
                   <LiquidBackground
                     district={district}
